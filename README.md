@@ -92,7 +92,7 @@ Los *beans* permiten implementar la lógica de negocio. Se recomienda crear inte
 
 Hay que tener en cuenta que los Beans pueden lanzar excepciones de negocio, por lo cual los métodos que lo hagan deben añadir `throws LaExcepcionQuePuedeLanzar` para que sean manejadas por los invocadores.
 
-### Módulo ejb
+### Módulo web
 
 Este módulo contiene los servicios rest. Aquí se crean las clases que se encargan de manejar las peticiones y se utilizan los *annotations* de Jax RS `@GET` `@POST`, etc. Se utilizan los *beans* del módulo *ejb* mediante `@Ejb` o `@Inject` y hay que considerar que si un *bean* lanza excepciones también hay que agregar el `throw` al método desde el cual se llama al bean y el *annotation* `@CatchExceptions` el cual se encarga de capturar las excepciones y generar un objeto JSON con el error.
 
