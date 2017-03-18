@@ -1,4 +1,39 @@
 # PWB - 2017
+## Configuracion de la Base de Datos
+
+Se utiliza Postgres. Se debe crear la base de datos y tener un usuario.  En el archivo 'ear/src/main/application/META-INF/pwb-ds.xml' configurar los datos de la base de datos:
+
+```
+...
+<connection-url>jdbc:postgresql://localhost:5432/BASEDEDATOS</connection-url>
+...
+         <security>
+            <user-name>USUARIO</user-name>
+            <password>PASSWORD</password>
+...
+
+```
+
+**IMPORTANTE:** Para que el sistema funcione el modulo Postgres debe estar configurado en el sistema jboss/wildfly. Se debe descargar el jdbc de postgres. Luego iniciar el servidor y despues lanzar el cliente:
+
+```
+./jboss-cli.sh
+```
+
+Luego instalar el modulo especificando la direccion donde se descargo el jdbc
+
+``` 
+module add --name=org.postgres --resources=/tmp/postgresql-9.3-1101.jdbc41.jar --dependencies=javax.api,javax.transaction.api
+```
+
+Finalmente instalar el jdbc:
+
+```
+/subsystem=datasources/jdbc-driver=postgres:add(driver-name="postgres",driver-module-name="org.postgres",driver-class-name=org.postgresql.Driver)
+```
+
+*Fuente: http://www.mastertheboss.com/jboss-server/jboss-datasource/configuring-a-datasource-with-postgresql-and-jboss-wildfly*
+
 ## Estructura básica
 En el módulo **ejb** se encuentra la mayor parte de la lógica de negocio y en el módulo **web** se encuentran los servicios rest.
 

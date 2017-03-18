@@ -52,6 +52,8 @@
             <artifactId>pwb-ejb</artifactId>
             <type>ejb</type>
         </dependency>
+        
+        
     </dependencies>
 
     <build>

@@ -2,26 +2,26 @@ package py.una.pol.iin.pwb.model;
 
 import java.util.HashMap;
 
-import py.una.pol.iin.pwb.bean.ICarritoBean;
+import py.una.pol.iin.pwb.bean.ICarritoVentaBean;
 
 public class SessionTable {
 	
-	private static HashMap<String, ICarritoBean> sessionTable = new HashMap<String, ICarritoBean>();
+	private static HashMap<String, ICarritoVentaBean> sessionTable = new HashMap<String, ICarritoVentaBean>();
 
-	public static HashMap<String, ICarritoBean> getSessionTable() {
+	public static HashMap<String, ICarritoVentaBean> getSessionTable() {
 		return sessionTable;
 	}
 
-	public static void setSessionTable(HashMap<String, ICarritoBean> sessionTable) {
+	public static void setSessionTable(HashMap<String, ICarritoVentaBean> sessionTable) {
 		SessionTable.sessionTable = sessionTable;
 	}
 	
-	public static void addSession(String sessionKey, ICarritoBean carrito)
+	public static void addSession(String sessionKey, ICarritoVentaBean carrito)
 	{
 		sessionTable.put(sessionKey, carrito);
 	}
 	
-	public static ICarritoBean getSession(String sessionKey)
+	public static ICarritoVentaBean getSession(String sessionKey)
 	{
 		return sessionTable.get(sessionKey);
 	}
