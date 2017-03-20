@@ -129,7 +129,7 @@ public class CarritoVentaResource {
 		
 	    if (sessionKey != null)
 	    {
-	    	carritoVentaBean = SessionTable.getSession(sessionKey);
+	    	carritoVentaBean = (ICarritoVentaBean) SessionTable.getSession(sessionKey);
 	    	if (carritoVentaBean != null)
 	    	{
 	    		System.out.println("El session key del cliente es: " + carritoVentaBean.getSessionKey());
