@@ -176,7 +176,6 @@ public class VentaBean implements IVentaBean {
 			
 		}		
 		catch (Exception e) {
-			System.out.println("HAY UN ERROR!!!!!!!!!!!!!!!! " + e.getMessage());
 			userTransaction.rollback();
 			throw new InvalidFormatException(e.getMessage());
 		}
