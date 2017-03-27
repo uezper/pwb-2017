@@ -46,7 +46,7 @@ public class VentaBean implements IVentaBean {
 	
 	
 	@Override
-	public Venta addVenta(Venta venta) throws InvalidFormatException, InvalidArgumentException {								
+	public Venta addVenta(Venta venta) throws InvalidFormatException, InvalidArgumentException, Exception {								
 		
 		try {
 			
@@ -115,10 +115,6 @@ public class VentaBean implements IVentaBean {
 		{
 			throw new InvalidArgumentException(e.getMessage());
 		}
-		catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
 		
 		
 		
@@ -127,7 +123,7 @@ public class VentaBean implements IVentaBean {
 	
 	
 	@Override
-	public boolean addVentasFromFile(String path) throws InvalidFormatException, InvalidArgumentException {			
+	public boolean addVentasFromFile(String path) throws InvalidFormatException, InvalidArgumentException, Exception {			
 		
 		try {
 			
@@ -178,27 +174,18 @@ public class VentaBean implements IVentaBean {
 				venta = null;
 			}
 			
-		}
+		}		
 		catch (Exception e) {
-			try {
-				userTransaction.rollback();
-			} catch (Exception e2) {
-				e2.printStackTrace();
-				return false;
-			}
+			System.out.println("HAY UN ERROR!!!!!!!!!!!!!!!! " + e.getMessage());
+			userTransaction.rollback();
 			throw new InvalidFormatException(e.getMessage());
 		}
 		
-		try {
-			if (userTransaction.getStatus() == Status.STATUS_ACTIVE)
-			{
-				userTransaction.commit();
-			}
-		} catch(Exception e)
+		if (userTransaction.getStatus() == Status.STATUS_ACTIVE)
 		{
-			e.printStackTrace();
-			return false;
+			userTransaction.commit();
 		}
+	
 		
 		return true;
 	}
