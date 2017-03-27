@@ -18,10 +18,10 @@ import py.una.pol.iin.pwb.bean.ICarritoCompraBean;
 import py.una.pol.iin.pwb.decortator.CatchExceptions;
 import py.una.pol.iin.pwb.exception.InvalidArgumentException;
 import py.una.pol.iin.pwb.exception.InvalidFormatException;
+import py.una.pol.iin.pwb.model.Compra;
 import py.una.pol.iin.pwb.model.DetalleCompra;
 import py.una.pol.iin.pwb.model.SessionIdentifierGenerator;
 import py.una.pol.iin.pwb.model.SessionTable;
-import py.una.pol.iin.pwb.model.Compra;
 
 @Path("/carritoCompra")
 @Consumes(MediaType.APPLICATION_JSON)

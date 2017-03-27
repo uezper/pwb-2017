@@ -15,7 +15,6 @@ import javax.ws.rs.core.MediaType;
 
 import py.una.pol.iin.pwb.bean.IProveedorBean;
 import py.una.pol.iin.pwb.decortator.CatchExceptions;
-import py.una.pol.iin.pwb.exception.DataNotFoundException;
 import py.una.pol.iin.pwb.model.Proveedor;
 
 

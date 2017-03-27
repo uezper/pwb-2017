@@ -1,6 +1,6 @@
 package py.una.pol.iin.pwb.model;
-import java.security.SecureRandom;
 import java.math.BigInteger;
+import java.security.SecureRandom;
 
 public final class SessionIdentifierGenerator {
   private static SecureRandom random = new SecureRandom();

@@ -14,11 +14,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import py.una.pol.iin.pwb.bean.IProductoBean;
-import py.una.pol.iin.pwb.bean.IVentaBean;
 import py.una.pol.iin.pwb.decortator.CatchExceptions;
-import py.una.pol.iin.pwb.exception.DataNotFoundException;
 import py.una.pol.iin.pwb.model.Producto;
-import py.una.pol.iin.pwb.model.Venta;
 
 @Path("/productos")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -27,17 +24,6 @@ public class ProductoResource {
 	
 	@Inject
 	IProductoBean productoBean;
-	@Inject
-	IVentaBean ventaBean;
-	
-	@POST
-	@Path("/vender")
-	@CatchExceptions
-	public Venta vender(Venta venta) throws Exception
-	{
-		return ventaBean.addVenta(venta);
-	}
-	
 	
 	@GET
 	@CatchExceptions

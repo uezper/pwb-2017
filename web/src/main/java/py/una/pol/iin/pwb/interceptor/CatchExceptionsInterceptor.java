@@ -24,6 +24,7 @@ public class CatchExceptionsInterceptor {
 		Status status = null;
 		String message = null;
 		
+		
 		try {
 			Object ret = context.proceed();
 			return ret;

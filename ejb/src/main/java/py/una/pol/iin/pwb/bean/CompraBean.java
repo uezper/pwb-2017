@@ -7,10 +7,10 @@ import javax.persistence.EntityManager;
 import py.una.pol.iin.pwb.exception.DataNotFoundException;
 import py.una.pol.iin.pwb.exception.InvalidArgumentException;
 import py.una.pol.iin.pwb.exception.InvalidFormatException;
-import py.una.pol.iin.pwb.model.Proveedor;
+import py.una.pol.iin.pwb.model.Compra;
 import py.una.pol.iin.pwb.model.DetalleCompra;
 import py.una.pol.iin.pwb.model.Producto;
-import py.una.pol.iin.pwb.model.Compra;
+import py.una.pol.iin.pwb.model.Proveedor;
 import py.una.pol.iin.pwb.validator.CustomValidator;
 
 @Stateless
