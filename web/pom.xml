@@ -45,7 +45,6 @@
       <dependency>
          <groupId>py.una.pol.iin.pwb</groupId>
          <artifactId>pwb-ejb</artifactId>
-         <version>${project.version}</version>
          <type>ejb</type>
          <scope>provided</scope>
       </dependency>
@@ -150,5 +149,4 @@
       </plugins>
    </build>
 
-   <groupId>py.una.pol.iin.pwb</groupId>
 </project>
