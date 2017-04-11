@@ -29,7 +29,7 @@ public class ClienteResource {
 	
 	@GET
 	@CatchExceptions
-	public List<Cliente> getAllClientes()
+	public List<Cliente> getAllClientes() throws Exception
 	{
 		return clienteBean.getAllClientes();
 	}
@@ -63,7 +63,7 @@ public class ClienteResource {
 	@DELETE
 	@CatchExceptions
 	@Path("/{clienteId: [0-9]+}")
-	public void deleteCliente(@PathParam("clienteId") long id)
+	public void deleteCliente(@PathParam("clienteId") long id) throws Exception
 	{
 		clienteBean.removeCliente(id);
 	}

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+  <typeAliases>
+  	<typeAlias alias="Cliente" type="py.una.pol.iin.pwb.model.Cliente"/>
+  </typeAliases>
+  <environments default="production">
+    <environment id="production">
+      <transactionManager type="MANAGED"/>      
+      <dataSource type="JNDI">
+    	<property name="data_source" value="java:jboss/datasources/pwbDS"/>
+	  </dataSource>
+    </environment>
+  </environments>
+  <mappers>
+    <mapper resource="py/una/pol/iin/pwb/mybatis/mappers/ClienteMapper.xml"/>
+  </mappers>
+</configuration>
