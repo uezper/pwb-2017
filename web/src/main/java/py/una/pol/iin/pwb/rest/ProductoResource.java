@@ -27,7 +27,7 @@ public class ProductoResource {
 	
 	@GET
 	@CatchExceptions
-	public List<Producto> getAllProductos()
+	public List<Producto> getAllProductos() throws Exception
 	{
 		return productoBean.getAllProductos();
 	}
@@ -61,7 +61,7 @@ public class ProductoResource {
 	@DELETE
 	@CatchExceptions
 	@Path("/{productoId: [0-9]+}")
-	public void deleteProducto(@PathParam("productoId") long id)
+	public void deleteProducto(@PathParam("productoId") long id) throws Exception
 	{
 		productoBean.removeProducto(id);
 	}

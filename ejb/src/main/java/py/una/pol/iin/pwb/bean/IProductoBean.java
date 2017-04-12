@@ -11,10 +11,10 @@ import py.una.pol.iin.pwb.model.Producto;
 @Local
 public interface IProductoBean {
 	
-	public List<Producto> getAllProductos();
-	public Producto getProducto(Long id)  throws DataNotFoundException;
-	public Producto addProducto(Producto producto) throws InvalidFormatException;
-	public Producto updateProducto(Producto producto)  throws DataNotFoundException, InvalidFormatException;
-	public void removeProducto(Long id);
+	public List<Producto> getAllProductos() throws Exception;
+	public Producto getProducto(Long id)  throws DataNotFoundException, Exception;
+	public Producto addProducto(Producto producto) throws InvalidFormatException, Exception;
+	public Producto updateProducto(Producto producto)  throws DataNotFoundException, InvalidFormatException, Exception;
+	public void removeProducto(Long id) throws Exception;
 	
 }

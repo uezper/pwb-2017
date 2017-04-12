@@ -16,7 +16,6 @@ import py.una.pol.iin.pwb.validator.CustomValidator;
 @Stateless
 public class ClienteBean implements IClienteBean {
 
-	
 	@Override
 	public List<Cliente> getAllClientes() throws Exception {
 				
@@ -83,7 +82,7 @@ public class ClienteBean implements IClienteBean {
 		
 		SqlSession session = MyBatisUtil.getSession();						
 		ClienteMapper clienteMapper = session.getMapper(ClienteMapper.class);
-		clienteMapper.deleteCliente(id);
+		clienteMapper.deleteClienteById(id);
 		session.close();
 					
 	}
