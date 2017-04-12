@@ -16,6 +16,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -30,6 +31,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import py.una.pol.iin.pwb.bean.IVentaBean;
 import py.una.pol.iin.pwb.decortator.CatchExceptions;
+import py.una.pol.iin.pwb.model.Cliente;
 import py.una.pol.iin.pwb.model.FileUpload;
 import py.una.pol.iin.pwb.model.SessionIdentifierGenerator;
 import py.una.pol.iin.pwb.model.Venta;
@@ -42,8 +44,16 @@ public class VentaResource {
 	IVentaBean ventaBean;
 	
 	@GET
+	@CatchExceptions
+	@Path("/{ventaId: [0-9]+}")
+	public Venta getVenta(@PathParam("ventaId") long id) throws Exception
+	{
+		return ventaBean.getVenta(id);
+	}
+	
+	@GET
 	@Path("/")
-	public Response getAllVentas()
+	public Response getAllVentas() throws Exception
 	{
 		  StreamingOutput stream = new StreamingOutput() {
 			
@@ -55,31 +65,37 @@ public class VentaResource {
 				String separador = "";
 				writer.print("[");
 				
-				int offset = 0;
+				Long offset = 0L;
 				int num_ventas = 10;
 				
 				while(true)
 				{
-					Entry<ArrayList<Venta>, Integer> result = ventaBean.getAllVentas(offset, num_ventas);
-					if (result.getValue() == offset) break;
-										
-					offset = result.getValue();
-					
-					
-					for (Venta venta : result.getKey())
-					{
+					try {
+						Entry<ArrayList<Venta>, Long> result = ventaBean.getAllVentas(offset, num_ventas);
+												
+						if (result.getValue() == offset) break;
+											
+						offset = result.getValue();
 						
-						ObjectMapper objectMapper = new ObjectMapper();
-						writer.print(separador);
-						writer.print(objectMapper.writeValueAsString(venta));
-						separador = ",";
-					}					
-					writer.flush();
+						
+						for (Venta venta : result.getKey())
+						{
+							
+							ObjectMapper objectMapper = new ObjectMapper();
+							writer.print(separador);
+							writer.print(objectMapper.writeValueAsString(venta));
+							separador = ",";
+						}					
+						
+					} catch (Exception e)
+					{
+						e.printStackTrace();
+					}
 					
 				}
 				
-				writer.print("]");				
-				writer.flush();
+				writer.print("]");						
+				writer.close();
 								
 			}
 		};

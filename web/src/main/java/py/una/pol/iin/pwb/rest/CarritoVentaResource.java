@@ -146,7 +146,7 @@ public class CarritoVentaResource {
 					   
 			try {
 				
-				String sk = SessionIdentifierGenerator.nextSessionId();
+				String sk = "venta_" + SessionIdentifierGenerator.nextSessionId();
 				System.out.println("El cliente aun no tiene un key, se debe generar:" + sk);
 				
 				Context ctx = new InitialContext();

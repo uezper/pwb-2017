@@ -106,7 +106,7 @@ public class DetalleVenta implements Serializable {
 	}
 
 
-	public void setProductoId(Long productoId) {
+	public void setProductoId(Long productoId) {		
 		this.productoId = productoId;
 	}
 	

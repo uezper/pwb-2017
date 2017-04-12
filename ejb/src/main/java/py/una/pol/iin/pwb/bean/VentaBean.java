@@ -16,6 +16,8 @@ import javax.persistence.EntityManager;
 import javax.transaction.Status;
 import javax.transaction.UserTransaction;
 
+import org.apache.ibatis.session.SqlSession;
+
 import py.una.pol.iin.pwb.exception.DataNotFoundException;
 import py.una.pol.iin.pwb.exception.InvalidArgumentException;
 import py.una.pol.iin.pwb.exception.InvalidFormatException;
@@ -23,6 +25,9 @@ import py.una.pol.iin.pwb.model.Cliente;
 import py.una.pol.iin.pwb.model.DetalleVenta;
 import py.una.pol.iin.pwb.model.Producto;
 import py.una.pol.iin.pwb.model.Venta;
+import py.una.pol.iin.pwb.mybatis.DetalleVentaMapper;
+import py.una.pol.iin.pwb.mybatis.MyBatisUtil;
+import py.una.pol.iin.pwb.mybatis.VentaMapper;
 import py.una.pol.iin.pwb.repository.VentaRepository;
 import py.una.pol.iin.pwb.util.FileVentaParser;
 import py.una.pol.iin.pwb.validator.CustomValidator;
@@ -32,21 +37,32 @@ import py.una.pol.iin.pwb.validator.CustomValidator;
 public class VentaBean implements IVentaBean {
 
 	@Inject
-	EntityManager em;
-	@Inject
 	IProductoBean productoBean;
 	@Inject
 	IClienteBean clienteBean;
-	@Inject
-	VentaRepository ventaRepository;
-	
 	
 	@Resource
 	UserTransaction userTransaction;
-	
+
 	
 	@Override
-	public Venta addVenta(Venta venta) throws InvalidFormatException, InvalidArgumentException, Exception {								
+	public Venta getVenta(Long id) throws Exception {
+		SqlSession session = MyBatisUtil.getSession();
+		VentaMapper ventaMapper = session.getMapper(VentaMapper.class);
+		Venta venta = ventaMapper.findVentaById(id);		
+		if (venta == null) {
+			throw new DataNotFoundException("La venta con id " + id + " no existe");
+		}					
+		
+		venta.setDetalles(venta.getDetalleVentas().toArray(new DetalleVenta[venta.getDetalleVentas().size()]));
+		venta.setClienteId(venta.getCliente().getId());
+		session.close();
+		
+		return venta;
+	}
+	
+	@Override
+	public Venta addVenta(Venta venta) throws InvalidFormatException, InvalidArgumentException, Exception {
 		
 		try {
 			
@@ -57,17 +73,19 @@ public class VentaBean implements IVentaBean {
 				commit = true;
 			}
 			
+			SqlSession session = MyBatisUtil.getSession();
+			VentaMapper ventaMapper = session.getMapper(VentaMapper.class);
+			DetalleVentaMapper detalleVentaMapper = session.getMapper(DetalleVentaMapper.class);
+			
 			CustomValidator.validateAndThrow(venta);
 			Cliente cliente = clienteBean.getCliente(venta.getClienteId());
-			
 			
 			
 			double total = 0;
 			for (DetalleVenta detalleVenta : venta.getDetalles())
 			{			
 				detalleVenta.setVenta(venta);							
-				CustomValidator.validateAndThrow(detalleVenta);
-				
+				CustomValidator.validateAndThrow(detalleVenta);				
 							
 				Producto producto = productoBean.getProducto(detalleVenta.getProductoId());		
 				if (detalleVenta.getCantidad() > producto.getCantidad()) {
@@ -78,7 +96,7 @@ public class VentaBean implements IVentaBean {
 		
 			
 			venta.setCliente(cliente);
-			em.persist(venta);			
+			ventaMapper.insertVenta(venta);
 			
 			for (DetalleVenta detalleVenta : venta.getDetalles())
 			{
@@ -86,42 +104,39 @@ public class VentaBean implements IVentaBean {
 				
 				detalleVenta.setVenta(venta);
 				detalleVenta.setProducto(producto);
-				em.persist(detalleVenta);
+				detalleVentaMapper.insertDetalleVenta(detalleVenta);				
 				
 				total += detalleVenta.getPrecioUnitario() * detalleVenta.getCantidad();
 																
 				producto.setCantidad(producto.getCantidad() - detalleVenta.getCantidad());
-				em.merge(producto);
+				productoBean.updateProducto(producto);				
 			}
 			
 			
 			cliente.setDeuda(cliente.getDeuda() + total);
 			venta.setMontoTotal(total);
 			
+			clienteBean.updateCliente(cliente);
+			ventaMapper.updateVenta(venta);
 			
-			em.merge(cliente);
-			em.merge(venta);
-			em.flush();
-			em.refresh(venta);			
+			session.close();
 			
 			if (commit)
 			{
 				userTransaction.commit();
 			}
 			
+			
+			
 			return venta;
 			
 		} catch(DataNotFoundException e)
 		{
 			throw new InvalidArgumentException(e.getMessage());
-		}
-		
-		
+		}	
 		
 	}
-
-	
-	
+		
 	@Override
 	public boolean addVentasFromFile(String path) throws InvalidFormatException, InvalidArgumentException, Exception {			
 		
@@ -192,66 +207,26 @@ public class VentaBean implements IVentaBean {
 
 
 	@Override
-	public Entry<ArrayList<Venta>, Integer> getAllVentas(int offset_rows, int num_ventas) {
-				
-		int limit_rows = 50;
-		int ventas_count = 0;
-		int last_offset = offset_rows;
+	public Entry<ArrayList<Venta>, Long> getAllVentas(Long offset, int num_ventas) throws Exception {
 		
-		HashMap<Long, Venta> ventas = new HashMap<>();
-		List<Venta> result;
+		SqlSession session = MyBatisUtil.getSession();
+		VentaMapper ventaMapper = session.getMapper(VentaMapper.class);
+		DetalleVentaMapper detalleVentaMapper = session.getMapper(DetalleVentaMapper.class);
 		
+		ArrayList<Venta> ventas = new ArrayList<>(ventaMapper.findAllVentas(offset + 1, num_ventas));
+		
+		long max_id = offset;
+		for (Venta venta : ventas) {
+			venta.setDetalleVentas(detalleVentaMapper.findDetalleVentaFromVenta(venta.getId()));
+			venta.setDetalles(venta.getDetalleVentas().toArray(new DetalleVenta[venta.getDetalleVentas().size()]));
 			
-		while (true) {			
-			
-			result = ventaRepository.findAllVentas(offset_rows, limit_rows);									
-			
-			if (result.size() == 0) break;
-			
-			for (Venta venta : result)
-			{		
-				if (!ventas.containsKey(venta.getId()))
-				{
-					if (ventas_count < num_ventas) {
-						last_offset += venta.getDetalles().length;
-						
-						ventas.put(venta.getId(), venta);
-					}
-					ventas_count++;
-										
-				} else {
-						Venta existingVenta = ventas.get(venta.getId());
-						ArrayList<DetalleVenta> detalles = 
-								new ArrayList<>(Arrays.asList(existingVenta.getDetalles()));
-						
-						for (DetalleVenta detalleVenta : venta.getDetalles())
-						{
-							detalles.add(detalleVenta);
-						}
-						
-						DetalleVenta[] detalles_array = new DetalleVenta[detalles.size()];
-						detalles_array = detalles.toArray(detalles_array);
-						existingVenta.setDetalles(detalles_array);
-						
-						last_offset += venta.getDetalles().length;
-						
-						
-						ventas.put(existingVenta.getId(), existingVenta);
-				}
-				
-				if (ventas_count > num_ventas) break;
-			}
-			if (ventas_count > num_ventas) break;
-			
-			offset_rows = last_offset;
+			if (venta.getId() > max_id) { max_id = venta.getId(); }
 		}
 		
-		ArrayList<Venta> ventas_list = new ArrayList<>(ventas.values());
-				
-		return new SimpleEntry(ventas_list, last_offset);
-	}
-
-	
-	
-	
+		session.close();
+		
+		return new SimpleEntry(ventas, max_id);
+		
+	}	
+		
 }

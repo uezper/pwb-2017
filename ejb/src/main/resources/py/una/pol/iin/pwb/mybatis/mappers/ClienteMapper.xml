@@ -5,6 +5,14 @@
   
   <mapper namespace="py.una.pol.iin.pwb.mybatis.ClienteMapper">
 	  
+   	<!--    RESULT MAPS    -->
+	 <resultMap id="ClienteMap" type="Cliente" >
+	    <id column="id" property="id"  />
+	    <result column="nombre" property="nombre" />
+	    <result column="telefono" property="telefono" />
+	    <result column="deuda" property="deuda" />	    
+	</resultMap>  
+	  
 	  <!--  INSERT  -->
 	  <insert id="insertCliente" useGeneratedKeys="true" keyProperty="id" parameterType="Cliente">
 	  	insert into Cliente(nombre, telefono, deuda) values (#{nombre}, #{telefono}, #{deuda});

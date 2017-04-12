@@ -6,6 +6,8 @@
   <typeAliases>
   	<typeAlias alias="Cliente" type="py.una.pol.iin.pwb.model.Cliente"/>
   	<typeAlias alias="Producto" type="py.una.pol.iin.pwb.model.Producto"/>
+  	<typeAlias alias="Venta" type="py.una.pol.iin.pwb.model.Venta"/>
+  	<typeAlias alias="DetalleVenta" type="py.una.pol.iin.pwb.model.DetalleVenta"/>
   </typeAliases>
   <environments default="production">
     <environment id="production">
@@ -18,5 +20,7 @@
   <mappers>
     <mapper resource="py/una/pol/iin/pwb/mybatis/mappers/ClienteMapper.xml"/>
     <mapper resource="py/una/pol/iin/pwb/mybatis/mappers/ProductoMapper.xml"/>
+    <mapper resource="py/una/pol/iin/pwb/mybatis/mappers/VentaMapper.xml"/>
+    <mapper resource="py/una/pol/iin/pwb/mybatis/mappers/DetalleVentaMapper.xml"/>
   </mappers>
 </configuration>
