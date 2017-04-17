@@ -16,6 +16,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -30,6 +31,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import py.una.pol.iin.pwb.bean.ICompraBean;
 import py.una.pol.iin.pwb.decortator.CatchExceptions;
+import py.una.pol.iin.pwb.model.Proveedor;
 import py.una.pol.iin.pwb.model.FileUpload;
 import py.una.pol.iin.pwb.model.SessionIdentifierGenerator;
 import py.una.pol.iin.pwb.model.Compra;
@@ -42,8 +44,16 @@ public class CompraResource {
 	ICompraBean compraBean;
 	
 	@GET
+	@CatchExceptions
+	@Path("/{compraId: [0-9]+}")
+	public Compra getCompra(@PathParam("compraId") long id) throws Exception
+	{
+		return compraBean.getCompra(id);
+	}
+	
+	@GET
 	@Path("/")
-	public Response getAllCompras()
+	public Response getAllCompras() throws Exception
 	{
 		  StreamingOutput stream = new StreamingOutput() {
 			
@@ -55,31 +65,37 @@ public class CompraResource {
 				String separador = "";
 				writer.print("[");
 				
-				int offset = 0;
+				Long offset = 0L;
 				int num_compras = 10;
 				
 				while(true)
 				{
-					Entry<ArrayList<Compra>, Integer> result = compraBean.getAllCompras(offset, num_compras);
-					if (result.getValue() == offset) break;
-										
-					offset = result.getValue();
-					
-					
-					for (Compra compra : result.getKey())
-					{
+					try {
+						Entry<ArrayList<Compra>, Long> result = compraBean.getAllCompras(offset, num_compras);
+												
+						if (result.getValue() == offset) break;
+											
+						offset = result.getValue();
 						
-						ObjectMapper objectMapper = new ObjectMapper();
-						writer.print(separador);
-						writer.print(objectMapper.writeValueAsString(compra));
-						separador = ",";
-					}					
-					writer.flush();
+						
+						for (Compra compra : result.getKey())
+						{
+							
+							ObjectMapper objectMapper = new ObjectMapper();
+							writer.print(separador);
+							writer.print(objectMapper.writeValueAsString(compra));
+							separador = ",";
+						}					
+						
+					} catch (Exception e)
+					{
+						e.printStackTrace();
+					}
 					
 				}
 				
-				writer.print("]");				
-				writer.flush();
+				writer.print("]");						
+				writer.close();
 								
 			}
 		};

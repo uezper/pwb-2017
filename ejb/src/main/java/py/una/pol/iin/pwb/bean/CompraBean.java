@@ -16,6 +16,8 @@ import javax.persistence.EntityManager;
 import javax.transaction.Status;
 import javax.transaction.UserTransaction;
 
+import org.apache.ibatis.session.SqlSession;
+
 import py.una.pol.iin.pwb.exception.DataNotFoundException;
 import py.una.pol.iin.pwb.exception.InvalidArgumentException;
 import py.una.pol.iin.pwb.exception.InvalidFormatException;
@@ -23,6 +25,9 @@ import py.una.pol.iin.pwb.model.Proveedor;
 import py.una.pol.iin.pwb.model.DetalleCompra;
 import py.una.pol.iin.pwb.model.Producto;
 import py.una.pol.iin.pwb.model.Compra;
+import py.una.pol.iin.pwb.mybatis.DetalleCompraMapper;
+import py.una.pol.iin.pwb.mybatis.MyBatisUtil;
+import py.una.pol.iin.pwb.mybatis.CompraMapper;
 import py.una.pol.iin.pwb.repository.CompraRepository;
 import py.una.pol.iin.pwb.util.FileCompraParser;
 import py.una.pol.iin.pwb.validator.CustomValidator;
@@ -32,21 +37,32 @@ import py.una.pol.iin.pwb.validator.CustomValidator;
 public class CompraBean implements ICompraBean {
 
 	@Inject
-	EntityManager em;
-	@Inject
 	IProductoBean productoBean;
 	@Inject
 	IProveedorBean proveedorBean;
-	@Inject
-	CompraRepository compraRepository;
-	
 	
 	@Resource
 	UserTransaction userTransaction;
-	
+
 	
 	@Override
-	public Compra addCompra(Compra compra) throws InvalidFormatException, InvalidArgumentException, Exception {								
+	public Compra getCompra(Long id) throws Exception {
+		SqlSession session = MyBatisUtil.getSession();
+		CompraMapper compraMapper = session.getMapper(CompraMapper.class);
+		Compra compra = compraMapper.findCompraById(id);		
+		if (compra == null) {
+			throw new DataNotFoundException("La compra con id " + id + " no existe");
+		}					
+		
+		compra.setDetalles(compra.getDetalleCompras().toArray(new DetalleCompra[compra.getDetalleCompras().size()]));
+		compra.setProveedorId(compra.getProveedor().getId());
+		session.close();
+		
+		return compra;
+	}
+	
+	@Override
+	public Compra addCompra(Compra compra) throws InvalidFormatException, InvalidArgumentException, Exception {
 		
 		try {
 			
@@ -57,22 +73,25 @@ public class CompraBean implements ICompraBean {
 				commit = true;
 			}
 			
+			SqlSession session = MyBatisUtil.getSession();
+			CompraMapper compraMapper = session.getMapper(CompraMapper.class);
+			DetalleCompraMapper detalleCompraMapper = session.getMapper(DetalleCompraMapper.class);
+			
 			CustomValidator.validateAndThrow(compra);
 			Proveedor proveedor = proveedorBean.getProveedor(compra.getProveedorId());
-			
 			
 			
 			double total = 0;
 			for (DetalleCompra detalleCompra : compra.getDetalles())
 			{			
 				detalleCompra.setCompra(compra);							
-				CustomValidator.validateAndThrow(detalleCompra);
+				CustomValidator.validateAndThrow(detalleCompra);										
 			}
 			
 		
 			
 			compra.setProveedor(proveedor);
-			em.persist(compra);			
+			compraMapper.insertCompra(compra);
 			
 			for (DetalleCompra detalleCompra : compra.getDetalles())
 			{
@@ -80,41 +99,38 @@ public class CompraBean implements ICompraBean {
 				
 				detalleCompra.setCompra(compra);
 				detalleCompra.setProducto(producto);
-				em.persist(detalleCompra);
+				detalleCompraMapper.insertDetalleCompra(detalleCompra);				
 				
 				total += detalleCompra.getPrecioUnitario() * detalleCompra.getCantidad();
 																
 				producto.setCantidad(producto.getCantidad() + detalleCompra.getCantidad());
-				em.merge(producto);
+				productoBean.updateProducto(producto);				
 			}
 			
 			
 			compra.setMontoTotal(total);
 			
+			proveedorBean.updateProveedor(proveedor);
+			compraMapper.updateCompra(compra);
 			
-			em.merge(proveedor);
-			em.merge(compra);
-			em.flush();
-			em.refresh(compra);			
+			session.close();
 			
 			if (commit)
 			{
 				userTransaction.commit();
 			}
 			
+			
+			
 			return compra;
 			
 		} catch(DataNotFoundException e)
 		{
 			throw new InvalidArgumentException(e.getMessage());
-		}
-		
-		
+		}	
 		
 	}
-
-	
-	
+		
 	@Override
 	public boolean addComprasFromFile(String path) throws InvalidFormatException, InvalidArgumentException, Exception {			
 		
@@ -185,66 +201,26 @@ public class CompraBean implements ICompraBean {
 
 
 	@Override
-	public Entry<ArrayList<Compra>, Integer> getAllCompras(int offset_rows, int num_compras) {
-				
-		int limit_rows = 50;
-		int compras_count = 0;
-		int last_offset = offset_rows;
+	public Entry<ArrayList<Compra>, Long> getAllCompras(Long offset, int num_compras) throws Exception {
 		
-		HashMap<Long, Compra> compras = new HashMap<>();
-		List<Compra> result;
+		SqlSession session = MyBatisUtil.getSession();
+		CompraMapper compraMapper = session.getMapper(CompraMapper.class);
+		DetalleCompraMapper detalleCompraMapper = session.getMapper(DetalleCompraMapper.class);
 		
+		ArrayList<Compra> compras = new ArrayList<>(compraMapper.findAllCompras(offset + 1, num_compras));
+		
+		long max_id = offset;
+		for (Compra compra : compras) {
+			compra.setDetalleCompras(detalleCompraMapper.findDetalleCompraFromCompra(compra.getId()));
+			compra.setDetalles(compra.getDetalleCompras().toArray(new DetalleCompra[compra.getDetalleCompras().size()]));
 			
-		while (true) {			
-			
-			result = compraRepository.findAllCompras(offset_rows, limit_rows);									
-			
-			if (result.size() == 0) break;
-			
-			for (Compra compra : result)
-			{		
-				if (!compras.containsKey(compra.getId()))
-				{
-					if (compras_count < num_compras) {
-						last_offset += compra.getDetalles().length;
-						
-						compras.put(compra.getId(), compra);
-					}
-					compras_count++;
-										
-				} else {
-						Compra existingCompra = compras.get(compra.getId());
-						ArrayList<DetalleCompra> detalles = 
-								new ArrayList<>(Arrays.asList(existingCompra.getDetalles()));
-						
-						for (DetalleCompra detalleCompra : compra.getDetalles())
-						{
-							detalles.add(detalleCompra);
-						}
-						
-						DetalleCompra[] detalles_array = new DetalleCompra[detalles.size()];
-						detalles_array = detalles.toArray(detalles_array);
-						existingCompra.setDetalles(detalles_array);
-						
-						last_offset += compra.getDetalles().length;
-						
-						
-						compras.put(existingCompra.getId(), existingCompra);
-				}
-				
-				if (compras_count > num_compras) break;
-			}
-			if (compras_count > num_compras) break;
-			
-			offset_rows = last_offset;
+			if (compra.getId() > max_id) { max_id = compra.getId(); }
 		}
 		
-		ArrayList<Compra> compras_list = new ArrayList<>(compras.values());
-				
-		return new SimpleEntry(compras_list, last_offset);
-	}
-
-	
-	
-	
+		session.close();
+		
+		return new SimpleEntry(compras, max_id);
+		
+	}	
+		
 }

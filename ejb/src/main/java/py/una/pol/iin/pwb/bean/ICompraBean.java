@@ -13,5 +13,6 @@ import py.una.pol.iin.pwb.model.Compra;
 public interface ICompraBean {
 	public Compra addCompra(Compra compra) throws InvalidFormatException, InvalidArgumentException, Exception;
 	public boolean addComprasFromFile(String path) throws InvalidFormatException, InvalidArgumentException, Exception;
-	public Entry<ArrayList<Compra>, Integer> getAllCompras(int offset_rows, int num_compras);
+	public Entry<ArrayList<Compra>, Long> getAllCompras(Long offset, int num_ventas) throws Exception;
+	public Compra getCompra(Long id) throws Exception;
 }

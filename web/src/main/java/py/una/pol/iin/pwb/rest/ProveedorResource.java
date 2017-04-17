@@ -29,7 +29,7 @@ public class ProveedorResource {
 	
 	@GET
 	@CatchExceptions
-	public List<Proveedor> getAllProveedores()
+	public List<Proveedor> getAllProveedores() throws Exception
 	{
 		return proveedorBean.getAllProveedores();
 	}
@@ -63,7 +63,7 @@ public class ProveedorResource {
 	@DELETE
 	@CatchExceptions
 	@Path("/{proveedorId: [0-9]+}")
-	public void deleteProveedor(@PathParam("proveedorId") long id)
+	public void deleteProveedor(@PathParam("proveedorId") long id) throws Exception
 	{
 		proveedorBean.removeProveedor(id);
 	}

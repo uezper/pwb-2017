@@ -13,6 +13,8 @@ import javax.persistence.EntityManager;
 import javax.transaction.Status;
 import javax.transaction.UserTransaction;
 
+import org.apache.ibatis.session.SqlSession;
+
 import py.una.pol.iin.pwb.exception.DataNotFoundException;
 import py.una.pol.iin.pwb.exception.InvalidArgumentException;
 import py.una.pol.iin.pwb.exception.InvalidFormatException;
@@ -20,6 +22,11 @@ import py.una.pol.iin.pwb.model.Compra;
 import py.una.pol.iin.pwb.model.DetalleCompra;
 import py.una.pol.iin.pwb.model.Producto;
 import py.una.pol.iin.pwb.model.Proveedor;
+import py.una.pol.iin.pwb.mybatis.MyBatisUtil;
+import py.una.pol.iin.pwb.mybatis.ProductoMapper;
+import py.una.pol.iin.pwb.mybatis.CompraMapper;
+import py.una.pol.iin.pwb.mybatis.DetalleCompraMapper;
+import py.una.pol.iin.pwb.mybatis.ProveedorMapper;
 import py.una.pol.iin.pwb.validator.CustomValidator;
 
 @Stateful
@@ -31,8 +38,6 @@ public class CarritoCompraBean implements ICarritoCompraBean {
 	@Resource
 	private UserTransaction userTransaction;
 	
-	@Inject
-	EntityManager em;
 	@Inject
 	IProductoBean productoBean;
 	@Inject
@@ -70,6 +75,9 @@ public class CarritoCompraBean implements ICarritoCompraBean {
 		
 		try {
 			
+			SqlSession session = MyBatisUtil.getSession();
+			CompraMapper compraMapper = session.getMapper(CompraMapper.class);
+			
 			// Para que el validador no tire el error de que la lista
 			// no puede ser nula o estar vacia.
 			compra.setDetalles(new DetalleCompra[2]);
@@ -82,9 +90,8 @@ public class CarritoCompraBean implements ICarritoCompraBean {
 			this.compra = compra;
 			this.compra.setProveedor(proveedor);
 			
-			em.persist(this.compra);
-			em.flush();
-			em.refresh(this.compra);
+			compraMapper.insertCompra(this.compra);
+			session.close();
 		} catch (DataNotFoundException e) {
 			if (userTransaction.getStatus() == Status.STATUS_ACTIVE) userTransaction.rollback();			
 			throw new InvalidArgumentException(e.getMessage());
@@ -107,7 +114,9 @@ public class CarritoCompraBean implements ICarritoCompraBean {
 		verifyStatus();
 		
 		
-		em.flush();
+		SqlSession session = MyBatisUtil.getSession();
+		ProveedorMapper proveedorMapper = session.getMapper(ProveedorMapper.class);
+		
 		this.compra = getCompra();
 		if (this.compra.getDetalleCompras().size() < 1)
 		{
@@ -115,11 +124,11 @@ public class CarritoCompraBean implements ICarritoCompraBean {
 		}
 		
 		Proveedor proveedor = this.compra.getProveedor();
-		em.merge(proveedor);
-		em.flush();
+		proveedorMapper.updateProveedor(proveedor);
 		
 		Compra compra = this.compra;
 		this.compra = null;
+		session.close();
 		userTransaction.commit();				
 		return compra;
 	}
@@ -139,6 +148,10 @@ public class CarritoCompraBean implements ICarritoCompraBean {
 		
 		verifyStatus();
 		
+		SqlSession session = MyBatisUtil.getSession();
+		ProductoMapper productoMapper = session.getMapper(ProductoMapper.class);
+		DetalleCompraMapper detalleCompraMapper = session.getMapper(DetalleCompraMapper.class);
+		
 		CustomValidator.validateAndThrow(detallesCompras);
 		
 		for (DetalleCompra detalleCompra : detallesCompras)
@@ -148,7 +161,7 @@ public class CarritoCompraBean implements ICarritoCompraBean {
 					Producto producto = productoBean.getProducto(detalleCompra.getProductoId());							
 					
 					producto.setCantidad(producto.getCantidad() + detalleCompra.getCantidad());
-					em.merge(producto);
+					productoMapper.updateProducto(producto);
 					
 					boolean actualizado = false;
 					for (DetalleCompra detalleCompraExistente : this.compra.getDetalleCompras())
@@ -156,7 +169,7 @@ public class CarritoCompraBean implements ICarritoCompraBean {
 						if (detalleCompraExistente.getProducto().getId() == detalleCompra.getProductoId())
 						{
 							detalleCompraExistente.setCantidad(detalleCompraExistente.getCantidad() + detalleCompra.getCantidad());
-							em.merge(detalleCompraExistente);
+							detalleCompraMapper.updateDetalleCompra(detalleCompraExistente);
 							actualizado = true;
 							break;
 						}
@@ -165,7 +178,7 @@ public class CarritoCompraBean implements ICarritoCompraBean {
 					{					
 						detalleCompra.setCompra(this.compra);
 						detalleCompra.setProducto(producto);
-						em.persist(detalleCompra);
+						detalleCompraMapper.insertDetalleCompra(detalleCompra);
 						
 					}
 					
@@ -177,7 +190,7 @@ public class CarritoCompraBean implements ICarritoCompraBean {
 			
 			
 		}
-		em.flush();
+		session.close();
 		return getCompra();
 	}
 
@@ -185,6 +198,10 @@ public class CarritoCompraBean implements ICarritoCompraBean {
 	public Compra quitarProductos(List<DetalleCompra> detallesCompras) throws InvalidArgumentException, InvalidFormatException, Exception {		
 		
 		verifyStatus();		
+		
+		SqlSession session = MyBatisUtil.getSession();
+		ProductoMapper productoMapper = session.getMapper(ProductoMapper.class);
+		DetalleCompraMapper detalleCompraMapper = session.getMapper(DetalleCompraMapper.class);
 		
 		for (DetalleCompra detalleCompra : detallesCompras)
 		{
@@ -223,7 +240,7 @@ public class CarritoCompraBean implements ICarritoCompraBean {
 					Producto producto = productoBean.getProducto(detalleCompra.getProductoId());							
 					
 					producto.setCantidad(producto.getCantidad() - detalleCompra.getCantidad());
-					em.merge(producto);
+					productoMapper.updateProducto(producto);
 					
 					for (DetalleCompra detalleCompraExistente : this.compra.getDetalleCompras())
 					{
@@ -232,7 +249,7 @@ public class CarritoCompraBean implements ICarritoCompraBean {
 							int cantidad = detalleCompraExistente.getCantidad() - detalleCompra.getCantidad();
 							if (cantidad > 0) {
 								detalleCompraExistente.setCantidad(cantidad);
-								em.merge(detalleCompraExistente);
+								detalleCompraMapper.updateDetalleCompra(detalleCompraExistente);
 							}							
 							break;
 						}
@@ -246,7 +263,7 @@ public class CarritoCompraBean implements ICarritoCompraBean {
 			
 			
 		}
-		em.flush();
+		session.close();
 		return getCompra();
 	}
 
@@ -254,6 +271,9 @@ public class CarritoCompraBean implements ICarritoCompraBean {
 	public Compra getCompra() throws InvalidArgumentException, Exception {
 		
 		verifyStatus();
+		
+		SqlSession session = MyBatisUtil.getSession();
+		CompraMapper compraMapper = session.getMapper(CompraMapper.class);
 		
 		DetalleCompra[] detalles = new DetalleCompra[this.compra.getDetalleCompras().size()];
 		double monto = 0f;
@@ -266,9 +286,8 @@ public class CarritoCompraBean implements ICarritoCompraBean {
 		this.compra.setMontoTotal(monto);
 		this.compra.setDetalles(detalles);
 		
-		em.merge(this.compra);
-		em.flush();
-		em.refresh(this.compra);
+		compraMapper.updateCompra(this.compra);
+		session.close();
 		
 		return this.compra;
 	}
