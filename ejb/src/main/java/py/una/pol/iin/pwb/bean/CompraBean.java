@@ -36,10 +36,10 @@ import py.una.pol.iin.pwb.validator.CustomValidator;
 @TransactionManagement(value=TransactionManagementType.BEAN)
 public class CompraBean implements ICompraBean {
 
-	@Inject
-	IProductoBean productoBean;
-	@Inject
-	IProveedorBean proveedorBean;
+	@Inject IProductoBean productoBean;
+	@Inject IProveedorBean proveedorBean;
+	@Inject CompraMapper compraMapper;
+	@Inject DetalleCompraMapper detalleCompraMapper;
 	
 	@Resource
 	UserTransaction userTransaction;
@@ -47,8 +47,6 @@ public class CompraBean implements ICompraBean {
 	
 	@Override
 	public Compra getCompra(Long id) throws Exception {
-		SqlSession session = MyBatisUtil.getSession();
-		CompraMapper compraMapper = session.getMapper(CompraMapper.class);
 		Compra compra = compraMapper.findCompraById(id);		
 		if (compra == null) {
 			throw new DataNotFoundException("La compra con id " + id + " no existe");
@@ -56,27 +54,22 @@ public class CompraBean implements ICompraBean {
 		
 		compra.setDetalles(compra.getDetalleCompras().toArray(new DetalleCompra[compra.getDetalleCompras().size()]));
 		compra.setProveedorId(compra.getProveedor().getId());
-		session.close();
-		
 		return compra;
 	}
 	
 	@Override
 	public Compra addCompra(Compra compra) throws InvalidFormatException, InvalidArgumentException, Exception {
-		
+
+		boolean commit = false;
 		try {
 			
-			boolean commit = false;
+
 			if (userTransaction.getStatus() == Status.STATUS_NO_TRANSACTION)
 			{
 				userTransaction.begin();
 				commit = true;
 			}
-			
-			SqlSession session = MyBatisUtil.getSession();
-			CompraMapper compraMapper = session.getMapper(CompraMapper.class);
-			DetalleCompraMapper detalleCompraMapper = session.getMapper(DetalleCompraMapper.class);
-			
+						
 			CustomValidator.validateAndThrow(compra);
 			Proveedor proveedor = proveedorBean.getProveedor(compra.getProveedorId());
 			
@@ -113,7 +106,6 @@ public class CompraBean implements ICompraBean {
 			proveedorBean.updateProveedor(proveedor);
 			compraMapper.updateCompra(compra);
 			
-			session.close();
 			
 			if (commit)
 			{
@@ -124,8 +116,8 @@ public class CompraBean implements ICompraBean {
 			
 			return compra;
 			
-		} catch(DataNotFoundException e)
-		{
+		}  catch (Exception e) {			
+			if (commit) { userTransaction.rollback(); }
 			throw new InvalidArgumentException(e.getMessage());
 		}	
 		
@@ -202,11 +194,7 @@ public class CompraBean implements ICompraBean {
 
 	@Override
 	public Entry<ArrayList<Compra>, Long> getAllCompras(Long offset, int num_compras) throws Exception {
-		
-		SqlSession session = MyBatisUtil.getSession();
-		CompraMapper compraMapper = session.getMapper(CompraMapper.class);
-		DetalleCompraMapper detalleCompraMapper = session.getMapper(DetalleCompraMapper.class);
-		
+			
 		ArrayList<Compra> compras = new ArrayList<>(compraMapper.findAllCompras(offset + 1, num_compras));
 		
 		long max_id = offset;
@@ -216,8 +204,6 @@ public class CompraBean implements ICompraBean {
 			
 			if (compra.getId() > max_id) { max_id = compra.getId(); }
 		}
-		
-		session.close();
 		
 		return new SimpleEntry(compras, max_id);
 		

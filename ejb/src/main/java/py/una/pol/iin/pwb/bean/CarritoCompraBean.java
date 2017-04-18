@@ -24,9 +24,12 @@ import py.una.pol.iin.pwb.model.Producto;
 import py.una.pol.iin.pwb.model.Proveedor;
 import py.una.pol.iin.pwb.mybatis.MyBatisUtil;
 import py.una.pol.iin.pwb.mybatis.ProductoMapper;
+import py.una.pol.iin.pwb.mybatis.ClienteMapper;
 import py.una.pol.iin.pwb.mybatis.CompraMapper;
 import py.una.pol.iin.pwb.mybatis.DetalleCompraMapper;
+import py.una.pol.iin.pwb.mybatis.DetalleVentaMapper;
 import py.una.pol.iin.pwb.mybatis.ProveedorMapper;
+import py.una.pol.iin.pwb.mybatis.VentaMapper;
 import py.una.pol.iin.pwb.validator.CustomValidator;
 
 @Stateful
@@ -38,10 +41,12 @@ public class CarritoCompraBean implements ICarritoCompraBean {
 	@Resource
 	private UserTransaction userTransaction;
 	
-	@Inject
-	IProductoBean productoBean;
-	@Inject
-	IProveedorBean proveedorBean;
+	@Inject IProductoBean productoBean;
+	@Inject IProveedorBean proveedorBean;
+	@Inject CompraMapper compraMapper;
+	@Inject DetalleCompraMapper detalleCompraMapper;
+	@Inject ProductoMapper productoMapper;
+	@Inject ProveedorMapper proveedorMapper;
 	
 	Compra compra;
 	
@@ -74,10 +79,7 @@ public class CarritoCompraBean implements ICarritoCompraBean {
 		}
 		
 		try {
-			
-			SqlSession session = MyBatisUtil.getSession();
-			CompraMapper compraMapper = session.getMapper(CompraMapper.class);
-			
+					
 			// Para que el validador no tire el error de que la lista
 			// no puede ser nula o estar vacia.
 			compra.setDetalles(new DetalleCompra[2]);
@@ -91,7 +93,6 @@ public class CarritoCompraBean implements ICarritoCompraBean {
 			this.compra.setProveedor(proveedor);
 			
 			compraMapper.insertCompra(this.compra);
-			session.close();
 		} catch (DataNotFoundException e) {
 			if (userTransaction.getStatus() == Status.STATUS_ACTIVE) userTransaction.rollback();			
 			throw new InvalidArgumentException(e.getMessage());
@@ -114,9 +115,6 @@ public class CarritoCompraBean implements ICarritoCompraBean {
 		verifyStatus();
 		
 		
-		SqlSession session = MyBatisUtil.getSession();
-		ProveedorMapper proveedorMapper = session.getMapper(ProveedorMapper.class);
-		
 		this.compra = getCompra();
 		if (this.compra.getDetalleCompras().size() < 1)
 		{
@@ -128,7 +126,6 @@ public class CarritoCompraBean implements ICarritoCompraBean {
 		
 		Compra compra = this.compra;
 		this.compra = null;
-		session.close();
 		userTransaction.commit();				
 		return compra;
 	}
@@ -148,9 +145,6 @@ public class CarritoCompraBean implements ICarritoCompraBean {
 		
 		verifyStatus();
 		
-		SqlSession session = MyBatisUtil.getSession();
-		ProductoMapper productoMapper = session.getMapper(ProductoMapper.class);
-		DetalleCompraMapper detalleCompraMapper = session.getMapper(DetalleCompraMapper.class);
 		
 		CustomValidator.validateAndThrow(detallesCompras);
 		
@@ -190,7 +184,6 @@ public class CarritoCompraBean implements ICarritoCompraBean {
 			
 			
 		}
-		session.close();
 		return getCompra();
 	}
 
@@ -199,9 +192,6 @@ public class CarritoCompraBean implements ICarritoCompraBean {
 		
 		verifyStatus();		
 		
-		SqlSession session = MyBatisUtil.getSession();
-		ProductoMapper productoMapper = session.getMapper(ProductoMapper.class);
-		DetalleCompraMapper detalleCompraMapper = session.getMapper(DetalleCompraMapper.class);
 		
 		for (DetalleCompra detalleCompra : detallesCompras)
 		{
@@ -263,7 +253,6 @@ public class CarritoCompraBean implements ICarritoCompraBean {
 			
 			
 		}
-		session.close();
 		return getCompra();
 	}
 
@@ -271,9 +260,6 @@ public class CarritoCompraBean implements ICarritoCompraBean {
 	public Compra getCompra() throws InvalidArgumentException, Exception {
 		
 		verifyStatus();
-		
-		SqlSession session = MyBatisUtil.getSession();
-		CompraMapper compraMapper = session.getMapper(CompraMapper.class);
 		
 		DetalleCompra[] detalles = new DetalleCompra[this.compra.getDetalleCompras().size()];
 		double monto = 0f;
@@ -287,7 +273,6 @@ public class CarritoCompraBean implements ICarritoCompraBean {
 		this.compra.setDetalles(detalles);
 		
 		compraMapper.updateCompra(this.compra);
-		session.close();
 		
 		return this.compra;
 	}

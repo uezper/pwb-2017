@@ -36,10 +36,10 @@ import py.una.pol.iin.pwb.validator.CustomValidator;
 @TransactionManagement(value=TransactionManagementType.BEAN)
 public class VentaBean implements IVentaBean {
 
-	@Inject
-	IProductoBean productoBean;
-	@Inject
-	IClienteBean clienteBean;
+	@Inject IProductoBean productoBean;
+	@Inject IClienteBean clienteBean;
+	@Inject VentaMapper ventaMapper;
+	@Inject DetalleVentaMapper detalleVentaMapper;
 	
 	@Resource
 	UserTransaction userTransaction;
@@ -47,8 +47,6 @@ public class VentaBean implements IVentaBean {
 	
 	@Override
 	public Venta getVenta(Long id) throws Exception {
-		SqlSession session = MyBatisUtil.getSession();
-		VentaMapper ventaMapper = session.getMapper(VentaMapper.class);
 		Venta venta = ventaMapper.findVentaById(id);		
 		if (venta == null) {
 			throw new DataNotFoundException("La venta con id " + id + " no existe");
@@ -56,27 +54,23 @@ public class VentaBean implements IVentaBean {
 		
 		venta.setDetalles(venta.getDetalleVentas().toArray(new DetalleVenta[venta.getDetalleVentas().size()]));
 		venta.setClienteId(venta.getCliente().getId());
-		session.close();
-		
 		return venta;
 	}
 	
 	@Override
 	public Venta addVenta(Venta venta) throws InvalidFormatException, InvalidArgumentException, Exception {
 		
+		boolean commit = false;
+		
 		try {
 			
-			boolean commit = false;
+			
 			if (userTransaction.getStatus() == Status.STATUS_NO_TRANSACTION)
 			{
 				userTransaction.begin();
 				commit = true;
 			}
-			
-			SqlSession session = MyBatisUtil.getSession();
-			VentaMapper ventaMapper = session.getMapper(VentaMapper.class);
-			DetalleVentaMapper detalleVentaMapper = session.getMapper(DetalleVentaMapper.class);
-			
+						
 			CustomValidator.validateAndThrow(venta);
 			Cliente cliente = clienteBean.getCliente(venta.getClienteId());
 			
@@ -119,8 +113,6 @@ public class VentaBean implements IVentaBean {
 			clienteBean.updateCliente(cliente);
 			ventaMapper.updateVenta(venta);
 			
-			session.close();
-			
 			if (commit)
 			{
 				userTransaction.commit();
@@ -130,8 +122,8 @@ public class VentaBean implements IVentaBean {
 			
 			return venta;
 			
-		} catch(DataNotFoundException e)
-		{
+		} catch (Exception e) {			
+			if (commit) { userTransaction.rollback(); }
 			throw new InvalidArgumentException(e.getMessage());
 		}	
 		
@@ -209,10 +201,6 @@ public class VentaBean implements IVentaBean {
 	@Override
 	public Entry<ArrayList<Venta>, Long> getAllVentas(Long offset, int num_ventas) throws Exception {
 		
-		SqlSession session = MyBatisUtil.getSession();
-		VentaMapper ventaMapper = session.getMapper(VentaMapper.class);
-		DetalleVentaMapper detalleVentaMapper = session.getMapper(DetalleVentaMapper.class);
-		
 		ArrayList<Venta> ventas = new ArrayList<>(ventaMapper.findAllVentas(offset + 1, num_ventas));
 		
 		long max_id = offset;
@@ -222,8 +210,6 @@ public class VentaBean implements IVentaBean {
 			
 			if (venta.getId() > max_id) { max_id = venta.getId(); }
 		}
-		
-		session.close();
 		
 		return new SimpleEntry(ventas, max_id);
 		
