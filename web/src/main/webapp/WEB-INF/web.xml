@@ -35,4 +35,21 @@
 		<url-pattern>/rest/*</url-pattern>
 	</servlet-mapping>
 
+	<security-constraint>
+	    <web-resource-collection>
+	        <url-pattern>/rest/*</url-pattern>
+	    </web-resource-collection>
+	    <auth-constraint>
+	        <role-name>user</role-name>
+	    </auth-constraint>
+	</security-constraint>
+	
+	<login-config>
+	    <auth-method>BASIC</auth-method>
+	</login-config>
+	
+	<security-role>	    
+	    <role-name>user</role-name>
+	</security-role>
+
 </web-app>
