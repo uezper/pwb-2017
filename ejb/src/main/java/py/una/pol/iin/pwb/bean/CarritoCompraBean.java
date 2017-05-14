@@ -160,7 +160,7 @@ public class CarritoCompraBean implements ICarritoCompraBean {
 					boolean actualizado = false;
 					for (DetalleCompra detalleCompraExistente : this.compra.getDetalleCompras())
 					{
-						if (detalleCompraExistente.getProducto().getId() == detalleCompra.getProductoId())
+						if (detalleCompraExistente.getProducto().getId().equals(detalleCompra.getProductoId()))
 						{
 							detalleCompraExistente.setCantidad(detalleCompraExistente.getCantidad() + detalleCompra.getCantidad());
 							detalleCompraMapper.updateDetalleCompra(detalleCompraExistente);
@@ -203,7 +203,7 @@ public class CarritoCompraBean implements ICarritoCompraBean {
 				boolean encontrado = false;
 				for (DetalleCompra detalleCompraExistente : this.compra.getDetalleCompras())
 				{
-					if (detalleCompraExistente.getProducto().getId() == detalleCompra.getProductoId())
+					if (detalleCompraExistente.getProducto().getId().equals(detalleCompra.getProductoId()))
 					{
 						if (detalleCompraExistente.getCantidad() < detalleCompra.getCantidad())
 							throw new InvalidArgumentException("La cantidad del producto " + producto.getId() + " que se quiere quitar es menor a la cantidad existente en el carrito");
@@ -234,7 +234,7 @@ public class CarritoCompraBean implements ICarritoCompraBean {
 					
 					for (DetalleCompra detalleCompraExistente : this.compra.getDetalleCompras())
 					{
-						if (detalleCompraExistente.getProducto().getId() == detalleCompra.getProductoId())
+						if (detalleCompraExistente.getProducto().getId().equals(detalleCompra.getProductoId()))
 						{
 							int cantidad = detalleCompraExistente.getCantidad() - detalleCompra.getCantidad();
 							if (cantidad > 0) {

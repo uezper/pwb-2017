@@ -56,7 +56,7 @@ public class VentaRepository {
 				detalles = new ArrayList<>();
 			}
 			
-			if (ventaId == venta.getId())
+			if (ventaId.equals(venta.getId()))
 			{
 				DetalleVenta detalleVenta = new DetalleVenta();
 				detalleVenta.setCantidad(cantidad);

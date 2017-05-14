@@ -73,7 +73,7 @@ public class VentaResource {
 					try {
 						Entry<ArrayList<Venta>, Long> result = ventaBean.getAllVentas(offset, num_ventas);
 												
-						if (result.getValue() == offset) break;
+						if (result.getValue().equals(offset)) break;
 											
 						offset = result.getValue();
 						

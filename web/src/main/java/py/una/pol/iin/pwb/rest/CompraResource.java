@@ -73,7 +73,7 @@ public class CompraResource {
 					try {
 						Entry<ArrayList<Compra>, Long> result = compraBean.getAllCompras(offset, num_compras);
 												
-						if (result.getValue() == offset) break;
+						if (result.getValue().equals(offset)) break;
 											
 						offset = result.getValue();
 						
