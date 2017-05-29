@@ -82,6 +82,13 @@
             <scope>test</scope>
         </dependency>
 
+		<!-- https://mvnrepository.com/artifact/org.mockito/mockito-all -->
+		<dependency>
+		    <groupId>org.mockito</groupId>
+		    <artifactId>mockito-all</artifactId>
+		    <version>1.8.4</version>
+		</dependency>
+		
         <!-- Optional, but highly recommended -->
         <!-- Arquillian allows you to test enterprise code such as EJBs and 
             Transactional(JTA) JPA from JUnit/TestNG -->

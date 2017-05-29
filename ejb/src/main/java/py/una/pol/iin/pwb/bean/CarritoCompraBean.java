@@ -1,6 +1,7 @@
 package py.una.pol.iin.pwb.bean;
 
 import java.util.List;
+import java.util.TreeSet;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -82,6 +83,7 @@ public class CarritoCompraBean implements ICarritoCompraBean {
 					
 			// Para que el validador no tire el error de que la lista
 			// no puede ser nula o estar vacia.
+			compra.setDetalleCompras(new TreeSet<DetalleCompra>());
 			compra.setDetalles(new DetalleCompra[2]);
 			
 			userTransaction.begin();
