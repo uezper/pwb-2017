@@ -33,15 +33,14 @@ public class ProveedorResourceTest extends RestTestSetup {
     public void postProveedorTest(){
     	// Given
         RequestSpecification postRequest = given()
-        .contentType("application/json")
-        .body(new Proveedor(null, "Alan Brado", "1234567890"));
+	        .contentType("application/json")
+	        .body(new Proveedor(null, "Alan Brado", "1234567890"));
         
     	// When
         Response response = postRequest.when().post("/proveedores");
 
     	// Then
-    	response.then()
-        .statusCode(200);
+    	response.then().statusCode(200);
     	Proveedor responseProveedor = response.as(Proveedor.class);
         assertNotNull(responseProveedor);
         assertNotNull(responseProveedor.getId());
@@ -52,8 +51,8 @@ public class ProveedorResourceTest extends RestTestSetup {
     public void getProveedorTest(){
     	// Given
     	Proveedor createdProveedor = given().contentType("application/json")
-		.body(new Proveedor(null, "Alan Brado", "1234567890"))
-        .when().post("/proveedores").as(Proveedor.class);
+			.body(new Proveedor(null, "Alan Brado", "1234567890"))
+	        .when().post("/proveedores").as(Proveedor.class);
     	
     	RequestSpecification getRequest = given();
 
@@ -70,11 +69,11 @@ public class ProveedorResourceTest extends RestTestSetup {
     public void putProveedorTest(){
     	// Given
         Proveedor createdProveedor = given().contentType("application/json")
-		.body(new Proveedor(null, "Alan Brado", "1234567890"))
-        .when().post("/proveedores").as(Proveedor.class);
+			.body(new Proveedor(null, "Alan Brado", "1234567890"))
+	        .when().post("/proveedores").as(Proveedor.class);
     	
     	RequestSpecification putRequest = given().contentType("application/json")
-		.body(new Proveedor(null, "Elen Brado", "0987654321"));
+			.body(new Proveedor(null, "Elen Brado", "0987654321"));
 
     	// When
     	Response response = putRequest.when().put("/proveedores/" + createdProveedor.getId());
@@ -91,7 +90,7 @@ public class ProveedorResourceTest extends RestTestSetup {
     public void deleteProveedorTest(){
     	// Given
     	Proveedor createdProveedor = given().contentType("application/json").body(new Proveedor(null, "Alan Brado", "1234567890"))
-        .when().post("/proveedores").as(Proveedor.class);
+			.when().post("/proveedores").as(Proveedor.class);
     	
     	RequestSpecification deleteRequest = given();
 

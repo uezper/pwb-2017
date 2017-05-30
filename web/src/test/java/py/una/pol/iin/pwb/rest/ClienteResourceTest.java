@@ -34,15 +34,14 @@ public class ClienteResourceTest extends RestTestSetup {
     	// Given
     	Cliente postCliente = new Cliente(null, "Alan Brado", "1234567890", 0.0);
         RequestSpecification postRequest = given()
-        .contentType("application/json")
-        .body(postCliente);
+	        .contentType("application/json")
+	        .body(postCliente);
         
     	// When
         Response response = postRequest.when().post("/clientes");
 
     	// Then
-    	response.then()
-        .statusCode(200);
+    	response.then().statusCode(200);
     	Cliente responseCliente = response.as(Cliente.class);
         assertNotNull(responseCliente);
         assertNotNull(responseCliente.getId());
@@ -53,8 +52,8 @@ public class ClienteResourceTest extends RestTestSetup {
     public void getClienteTest(){
     	// Given
     	Cliente createdCliente = given().contentType("application/json")
-		.body(new Cliente(null, "Alan Brado", "1234567890", 0.0))
-        .when().post("/clientes").as(Cliente.class);
+			.body(new Cliente(null, "Alan Brado", "1234567890", 0.0))
+	        .when().post("/clientes").as(Cliente.class);
     	
     	RequestSpecification getRequest = given();
 
@@ -71,11 +70,11 @@ public class ClienteResourceTest extends RestTestSetup {
     public void putClienteTest(){
     	// Given
     	Cliente createdCliente = given().contentType("application/json")
-		.body(new Cliente(null, "Alan Brado", "1234567890", 0.0))
-        .when().post("/clientes").as(Cliente.class);
+			.body(new Cliente(null, "Alan Brado", "1234567890", 0.0))
+	        .when().post("/clientes").as(Cliente.class);
     	
     	RequestSpecification putRequest = given().contentType("application/json")
-		.body(new Cliente(null, "Elen Brado", "0987654321", 10.0));
+			.body(new Cliente(null, "Elen Brado", "0987654321", 10.0));
 
     	// When
     	Response response = putRequest.when().put("/clientes/" + createdCliente.getId());
@@ -93,8 +92,8 @@ public class ClienteResourceTest extends RestTestSetup {
     public void deleteClienteTest(){
     	// Given
     	Cliente createdCliente = given().contentType("application/json")
-		.body(new Cliente(null, "Alan Brado", "1234567890", 0.0))
-        .when().post("/clientes").as(Cliente.class);
+			.body(new Cliente(null, "Alan Brado", "1234567890", 0.0))
+	        .when().post("/clientes").as(Cliente.class);
     	
     	RequestSpecification deleteRequest = given();
 

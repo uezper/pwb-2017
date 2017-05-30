@@ -34,15 +34,14 @@ public class ProductoResourceTest extends RestTestSetup {
     	// Given
     	Producto postProducto = new Producto(null, "Lapiz", 100);
         RequestSpecification postRequest = given()
-        .contentType("application/json")
-        .body(postProducto);
+	        .contentType("application/json")
+	        .body(postProducto);
         
     	// When
         Response response = postRequest.when().post("/productos");
 
     	// Then
-    	response.then()
-        .statusCode(200);
+    	response.then().statusCode(200);
     	Producto responseProducto = response.as(Producto.class);
         assertNotNull(responseProducto);
         assertNotNull(responseProducto.getId());
@@ -54,8 +53,8 @@ public class ProductoResourceTest extends RestTestSetup {
     public void getProductoTest(){
     	// Given
     	Producto createdProducto = given().contentType("application/json")
-		.body(new Producto(null, "Lapiz", 100))
-        .when().post("/productos").as(Producto.class);
+			.body(new Producto(null, "Lapiz", 100))
+	        .when().post("/productos").as(Producto.class);
     	
     	RequestSpecification getRequest = given();
 
@@ -72,11 +71,11 @@ public class ProductoResourceTest extends RestTestSetup {
     public void putProductoTest(){
     	// Given
     	Producto createdProducto = given().contentType("application/json")
-		.body(new Producto(null, "Lapiz", 100))
-        .when().post("/productos").as(Producto.class);
+			.body(new Producto(null, "Lapiz", 100))
+	        .when().post("/productos").as(Producto.class);
     	
     	RequestSpecification putRequest = given().contentType("application/json")
-		.body(new Producto(null, "Borrador", 101));
+    			.body(new Producto(null, "Borrador", 101));
 
     	// When
     	Response response = putRequest.when().put("/productos/" + createdProducto.getId());
@@ -93,8 +92,8 @@ public class ProductoResourceTest extends RestTestSetup {
     public void deleteProductoTest(){
     	// Given
     	Producto createdProducto = given().contentType("application/json")
-		.body(new Producto(null, "Lapiz", 100))
-        .when().post("/productos").as(Producto.class);
+			.body(new Producto(null, "Lapiz", 100))
+	        .when().post("/productos").as(Producto.class);
     	
     	RequestSpecification deleteRequest = given();
 
