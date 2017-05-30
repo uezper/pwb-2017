@@ -2,6 +2,10 @@ package py.una.pol.iin.pwb.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.inject.Inject;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
@@ -12,6 +16,8 @@ import py.una.pol.iin.pwb.model.DetalleVenta;
 import py.una.pol.iin.pwb.model.Venta;
 
 public class FileVentaParser {
+	
+	private Logger logger = Logger.getAnonymousLogger();
 	
 	File file;
 	JsonParser parser;
@@ -128,6 +134,7 @@ public class FileVentaParser {
 			}
 	        
 		} catch (IOException e) {
+			logger.log(Level.SEVERE, "an exception was thrown", e);
 			throw new InvalidFormatException(e.getMessage());
 		}
 		

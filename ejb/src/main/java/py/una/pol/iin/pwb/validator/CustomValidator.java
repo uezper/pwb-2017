@@ -22,19 +22,19 @@ public class CustomValidator {
 	    Set<ConstraintViolation<T>> constraintViolations = 
 	    		validator.validate( object );
 	    
-	    String message = "";
+	    StringBuilder message = new StringBuilder();
 	    String separator = "";
-	    if (constraintViolations.size() > 0) 
+	    if (constraintViolations.isEmpty()) 
 	    {	    	
 	    	Iterator<ConstraintViolation<T>> it = constraintViolations.iterator();
 	    	while (it.hasNext())
 	    	{
-	    		message += separator + it.next().getMessage();
+	    		message.append(separator).append(it.next().getMessage());
 	    		separator = "; ";
 	    	}
 	    		   
 	    }
-	    return message;
+	    return message.toString();
 	}
 	
 	public static <T> void validateAndThrow(T object) throws InvalidFormatException {

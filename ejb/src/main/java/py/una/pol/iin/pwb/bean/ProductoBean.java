@@ -18,7 +18,7 @@ public class ProductoBean implements IProductoBean {
 	
 	@Override
 	public List<Producto> getAllProductos() throws Exception {
-		List<Producto> productos = null;		
+		List<Producto> productos;		
 		productos = productoMapper.findAllProductos();
 		return productos;		
 	}

@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -31,15 +33,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import py.una.pol.iin.pwb.bean.ICompraBean;
 import py.una.pol.iin.pwb.decortator.CatchExceptions;
-import py.una.pol.iin.pwb.model.Proveedor;
+import py.una.pol.iin.pwb.model.Compra;
 import py.una.pol.iin.pwb.model.FileUpload;
 import py.una.pol.iin.pwb.model.SessionIdentifierGenerator;
-import py.una.pol.iin.pwb.model.Compra;
 
 @Path("/compras")
 @Produces(MediaType.APPLICATION_JSON)
 public class CompraResource {
 
+	private Logger logger = Logger.getAnonymousLogger();
+	
 	@Inject
 	ICompraBean compraBean;
 	
@@ -52,6 +55,7 @@ public class CompraResource {
 	}
 	
 	@GET
+	@CatchExceptions
 	@Path("/")
 	public Response getAllCompras() throws Exception
 	{
@@ -89,7 +93,7 @@ public class CompraResource {
 						
 					} catch (Exception e)
 					{
-						e.printStackTrace();
+						logger.log(Level.SEVERE, "an exception was thrown", e);
 					}
 					
 				}
@@ -135,7 +139,9 @@ public class CompraResource {
         boolean exito = compraBean.addComprasFromFile(FileUpload.TEMP_LOCATION + filename);
         
         File f = new File(FileUpload.TEMP_LOCATION + filename);
-        f.delete();
+        if (!f.delete()) {
+        	logger.log(Level.WARNING, "No se ha podido borrar el archivo %s", FileUpload.TEMP_LOCATION + filename);
+        }
         
         if (exito) { 
         	return Response
