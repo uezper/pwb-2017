@@ -48,7 +48,7 @@ public class Cliente implements Serializable {
 	{	
 	}
 	
-	public Cliente(long id, String nombre, String telefono, double deuda)
+	public Cliente(Long id, String nombre, String telefono, double deuda)
 	{
 		this.id = id;
 		this.nombre = nombre;
