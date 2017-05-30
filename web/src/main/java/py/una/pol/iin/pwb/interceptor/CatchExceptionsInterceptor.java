@@ -1,5 +1,8 @@
 package py.una.pol.iin.pwb.interceptor;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.interceptor.AroundInvoke;
 import javax.interceptor.Interceptor;
 import javax.interceptor.InvocationContext;
@@ -18,8 +21,10 @@ import py.una.pol.iin.pwb.model.ErrorMessage;
 @CatchExceptions
 public class CatchExceptionsInterceptor {
 
+	private static final Logger logger = Logger.getAnonymousLogger();
+	
 	@AroundInvoke
-    public Object catchExceptions(InvocationContext context) throws Exception {
+    public Object catchExceptions(InvocationContext context) {
         
 		Status status = null;
 		String message = null;
@@ -31,7 +36,7 @@ public class CatchExceptionsInterceptor {
 		}
 		catch (Exception e) {			
 			
-			System.out.println(e.getClass().getName() + " >> " + e.getMessage());
+			
 			
 			if (e instanceof DataNotFoundException)
 			{
@@ -42,6 +47,9 @@ public class CatchExceptionsInterceptor {
 			{
 				status = Status.BAD_REQUEST;
 				message = e.getMessage();
+			}
+			else {
+				logger.log(Level.SEVERE, "an exception was thrown", e);
 			}
 			
 			if (status == null) { 

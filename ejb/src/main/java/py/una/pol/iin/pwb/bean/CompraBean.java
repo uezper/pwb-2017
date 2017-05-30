@@ -2,33 +2,27 @@ package py.una.pol.iin.pwb.bean;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.annotation.Resource;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionManagement;
 import javax.ejb.TransactionManagementType;
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
 import javax.transaction.Status;
 import javax.transaction.UserTransaction;
-
-import org.apache.ibatis.session.SqlSession;
 
 import py.una.pol.iin.pwb.exception.DataNotFoundException;
 import py.una.pol.iin.pwb.exception.InvalidArgumentException;
 import py.una.pol.iin.pwb.exception.InvalidFormatException;
-import py.una.pol.iin.pwb.model.Proveedor;
+import py.una.pol.iin.pwb.model.Compra;
 import py.una.pol.iin.pwb.model.DetalleCompra;
 import py.una.pol.iin.pwb.model.Producto;
-import py.una.pol.iin.pwb.model.Compra;
-import py.una.pol.iin.pwb.mybatis.DetalleCompraMapper;
-import py.una.pol.iin.pwb.mybatis.MyBatisUtil;
+import py.una.pol.iin.pwb.model.Proveedor;
 import py.una.pol.iin.pwb.mybatis.CompraMapper;
-import py.una.pol.iin.pwb.repository.CompraRepository;
+import py.una.pol.iin.pwb.mybatis.DetalleCompraMapper;
 import py.una.pol.iin.pwb.util.FileCompraParser;
 import py.una.pol.iin.pwb.validator.CustomValidator;
 
@@ -36,6 +30,8 @@ import py.una.pol.iin.pwb.validator.CustomValidator;
 @TransactionManagement(value=TransactionManagementType.BEAN)
 public class CompraBean implements ICompraBean {
 
+	private Logger logger = Logger.getAnonymousLogger();
+	
 	@Inject IProductoBean productoBean;
 	@Inject IProveedorBean proveedorBean;
 	@Inject CompraMapper compraMapper;
@@ -117,6 +113,7 @@ public class CompraBean implements ICompraBean {
 			return compra;
 			
 		}  catch (Exception e) {			
+			logger.log(Level.SEVERE, "an exception was thrown", e);
 			if (commit) { userTransaction.rollback(); }
 			throw new InvalidArgumentException(e.getMessage());
 		}	
@@ -134,7 +131,7 @@ public class CompraBean implements ICompraBean {
 			Object o;
 			
 			Compra compra = null;
-			DetalleCompra detalleCompra = null;
+			DetalleCompra detalleCompra;
 			ArrayList<DetalleCompra> detalles = null;
 			
 			while((o = fp.nextObject()) != null)
@@ -172,11 +169,11 @@ public class CompraBean implements ICompraBean {
 				detalles_array = detalles.toArray(detalles_array);
 				compra.setDetalles(detalles_array);
 				addCompra(compra);
-				compra = null;
 			}
 			
 		}		
 		catch (Exception e) {
+			logger.log(Level.SEVERE, "an exception was thrown", e);
 			userTransaction.rollback();
 			throw new InvalidFormatException(e.getMessage());
 		}

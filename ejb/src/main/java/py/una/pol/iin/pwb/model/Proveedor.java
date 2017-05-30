@@ -38,7 +38,7 @@ public class Proveedor implements Serializable {
 	
 	@JsonIgnore
 	@OneToMany(targetEntity=Compra.class, mappedBy="proveedor")	
-	protected Set<Compra> compras;
+	private Set<Compra> compras;
 	
 	
 	public Proveedor()

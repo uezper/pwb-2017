@@ -2,6 +2,8 @@ package py.una.pol.iin.pwb.bean;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -13,8 +15,6 @@ import javax.inject.Inject;
 import javax.transaction.Status;
 import javax.transaction.UserTransaction;
 
-import org.apache.ibatis.session.SqlSession;
-
 import py.una.pol.iin.pwb.exception.DataNotFoundException;
 import py.una.pol.iin.pwb.exception.InvalidArgumentException;
 import py.una.pol.iin.pwb.exception.InvalidFormatException;
@@ -24,7 +24,6 @@ import py.una.pol.iin.pwb.model.Producto;
 import py.una.pol.iin.pwb.model.Venta;
 import py.una.pol.iin.pwb.mybatis.ClienteMapper;
 import py.una.pol.iin.pwb.mybatis.DetalleVentaMapper;
-import py.una.pol.iin.pwb.mybatis.MyBatisUtil;
 import py.una.pol.iin.pwb.mybatis.ProductoMapper;
 import py.una.pol.iin.pwb.mybatis.VentaMapper;
 import py.una.pol.iin.pwb.validator.CustomValidator;
@@ -37,6 +36,8 @@ public class CarritoVentaBean implements ICarritoVentaBean {
 
 	@Resource
 	private UserTransaction userTransaction;
+	
+	private Logger logger = Logger.getAnonymousLogger();
 	
 	@Inject IProductoBean productoBean;
 	@Inject IClienteBean clienteBean;
@@ -94,14 +95,23 @@ public class CarritoVentaBean implements ICarritoVentaBean {
 			
 			ventaMapper.insertVenta(this.venta);
 		} catch (DataNotFoundException e) {
-			if (userTransaction.getStatus() == Status.STATUS_ACTIVE) userTransaction.rollback();			
+			logger.log(Level.INFO, "an exception was thrown", e);
+			if (userTransaction.getStatus() == Status.STATUS_ACTIVE) {
+				userTransaction.rollback();			
+			}
 			throw new InvalidArgumentException(e.getMessage());
 		} catch (InvalidFormatException e) {
-			if (userTransaction.getStatus() == Status.STATUS_ACTIVE) userTransaction.rollback();			
+			logger.log(Level.INFO, "an exception was thrown", e);
+			if (userTransaction.getStatus() == Status.STATUS_ACTIVE) {
+				userTransaction.rollback();			
+			}
 			throw new InvalidFormatException(e.getMessage());
-		} catch (Exception e) {			
-			if (userTransaction.getStatus() == Status.STATUS_ACTIVE) userTransaction.rollback();
-			throw new Exception(e.getMessage());
+		} catch (Exception e) {
+			logger.log(Level.INFO, "an exception was thrown", e);
+			if (userTransaction.getStatus() == Status.STATUS_ACTIVE) {
+				userTransaction.rollback();
+			}
+			throw e;
 		}
 			
 		return getVenta();
@@ -114,7 +124,7 @@ public class CarritoVentaBean implements ICarritoVentaBean {
 		verifyStatus();
 		
 		this.venta = getVenta();
-		if (this.venta.getDetalleVentas().size() < 1)
+		if (this.venta.getDetalleVentas().isEmpty())
 		{
 			throw new InvalidArgumentException("No se puede finalizar una venta sin productos asociados");
 		}
@@ -123,10 +133,10 @@ public class CarritoVentaBean implements ICarritoVentaBean {
 		cliente.setDeuda(cliente.getDeuda() + venta.getMontoTotal());
 		clienteMapper.updateCliente(cliente);
 		
-		Venta venta = this.venta;
+		Venta venta_ = this.venta;
 		this.venta = null;
 		userTransaction.commit();				
-		return venta;
+		return venta_;
 	}
 	@Override
 	public void cancelarVenta() throws InvalidArgumentException, Exception {
@@ -157,7 +167,8 @@ public class CarritoVentaBean implements ICarritoVentaBean {
 					throw new InvalidArgumentException("La cantidad del producto " + producto.getId() + " a vender no puede ser mayor a la cantidad en stock");
 				}
 				
-			} catch (DataNotFoundException e) {				
+			} catch (DataNotFoundException e) {
+				logger.log(Level.INFO, "an exception was thrown", e);
 				throw new InvalidArgumentException(e.getMessage());				
 			} 
 		}		
@@ -194,8 +205,11 @@ public class CarritoVentaBean implements ICarritoVentaBean {
 					
 				} catch (Exception e)
 				{
-					if (userTransaction.getStatus() == Status.STATUS_ACTIVE) userTransaction.rollback();
-					throw new Exception(e.getMessage());
+					logger.log(Level.SEVERE, "an exception was thrown", e);
+					if (userTransaction.getStatus() == Status.STATUS_ACTIVE) {
+						userTransaction.rollback();
+					}
+					throw e;
 				}
 			
 			
@@ -233,7 +247,8 @@ public class CarritoVentaBean implements ICarritoVentaBean {
 					
 				}
 				
-			} catch (DataNotFoundException e) {				
+			} catch (DataNotFoundException e) {
+				logger.log(Level.INFO, "an exception was thrown", e);
 				throw new InvalidArgumentException(e.getMessage());				
 			} 
 		}		
@@ -263,8 +278,11 @@ public class CarritoVentaBean implements ICarritoVentaBean {
 					
 				} catch (Exception e)
 				{
-					if (userTransaction.getStatus() == Status.STATUS_ACTIVE) userTransaction.rollback();
-					throw new Exception(e.getMessage());
+					logger.log(Level.SEVERE, "an exception was thrown", e);
+					if (userTransaction.getStatus() == Status.STATUS_ACTIVE) {
+						userTransaction.rollback();
+					}
+					throw e;
 				}
 			
 			

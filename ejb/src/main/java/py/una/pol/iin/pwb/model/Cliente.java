@@ -41,7 +41,7 @@ public class Cliente implements Serializable {
 	
 	@JsonIgnore
 	@OneToMany(targetEntity=Venta.class, mappedBy="cliente")	
-	protected Set<Venta> ventas;
+	private Set<Venta> ventas;
 	
 	
 	public Cliente()

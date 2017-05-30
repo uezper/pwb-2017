@@ -22,7 +22,7 @@ public class ProveedorBean implements IProveedorBean {
 	@Override
 	public List<Proveedor> getAllProveedores() throws Exception {
 				
-		List<Proveedor> proveedores = null;		
+		List<Proveedor> proveedores;		
 		proveedores = proveedorMapper.findAllProveedores();
 		return proveedores;		
 	}
@@ -30,7 +30,7 @@ public class ProveedorBean implements IProveedorBean {
 	@Override
 	public Proveedor getProveedor(Long id) throws DataNotFoundException, Exception {
 		
-		Proveedor proveedor = null;		
+		Proveedor proveedor;		
 		proveedor = proveedorMapper.findProveedorById(id);
 		if (proveedor == null)
 			throw new DataNotFoundException("El proveedor con id " + id + " no existe");

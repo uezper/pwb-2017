@@ -2,21 +2,17 @@ package py.una.pol.iin.pwb.bean;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.annotation.Resource;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionManagement;
 import javax.ejb.TransactionManagementType;
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
 import javax.transaction.Status;
 import javax.transaction.UserTransaction;
-
-import org.apache.ibatis.session.SqlSession;
 
 import py.una.pol.iin.pwb.exception.DataNotFoundException;
 import py.una.pol.iin.pwb.exception.InvalidArgumentException;
@@ -26,9 +22,7 @@ import py.una.pol.iin.pwb.model.DetalleVenta;
 import py.una.pol.iin.pwb.model.Producto;
 import py.una.pol.iin.pwb.model.Venta;
 import py.una.pol.iin.pwb.mybatis.DetalleVentaMapper;
-import py.una.pol.iin.pwb.mybatis.MyBatisUtil;
 import py.una.pol.iin.pwb.mybatis.VentaMapper;
-import py.una.pol.iin.pwb.repository.VentaRepository;
 import py.una.pol.iin.pwb.util.FileVentaParser;
 import py.una.pol.iin.pwb.validator.CustomValidator;
 
@@ -36,6 +30,8 @@ import py.una.pol.iin.pwb.validator.CustomValidator;
 @TransactionManagement(value=TransactionManagementType.BEAN)
 public class VentaBean implements IVentaBean {
 
+	private Logger logger = Logger.getAnonymousLogger();
+	
 	@Inject IProductoBean productoBean;
 	@Inject IClienteBean clienteBean;
 	@Inject VentaMapper ventaMapper;
@@ -122,7 +118,8 @@ public class VentaBean implements IVentaBean {
 			
 			return venta;
 			
-		} catch (Exception e) {			
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, "an exception was thrown", e);
 			if (commit) { userTransaction.rollback(); }
 			throw new InvalidArgumentException(e.getMessage());
 		}	
@@ -140,7 +137,7 @@ public class VentaBean implements IVentaBean {
 			Object o;
 			
 			Venta venta = null;
-			DetalleVenta detalleVenta = null;
+			DetalleVenta detalleVenta;
 			ArrayList<DetalleVenta> detalles = null;
 			
 			while((o = fp.nextObject()) != null)
@@ -178,11 +175,11 @@ public class VentaBean implements IVentaBean {
 				detalles_array = detalles.toArray(detalles_array);
 				venta.setDetalles(detalles_array);
 				addVenta(venta);
-				venta = null;
 			}
 			
 		}		
 		catch (Exception e) {
+			logger.log(Level.SEVERE, "an exception was thrown", e);
 			userTransaction.rollback();
 			throw new InvalidFormatException(e.getMessage());
 		}

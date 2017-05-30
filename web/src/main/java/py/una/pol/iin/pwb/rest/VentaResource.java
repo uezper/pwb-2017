@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -31,7 +33,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import py.una.pol.iin.pwb.bean.IVentaBean;
 import py.una.pol.iin.pwb.decortator.CatchExceptions;
-import py.una.pol.iin.pwb.model.Cliente;
 import py.una.pol.iin.pwb.model.FileUpload;
 import py.una.pol.iin.pwb.model.SessionIdentifierGenerator;
 import py.una.pol.iin.pwb.model.Venta;
@@ -40,6 +41,8 @@ import py.una.pol.iin.pwb.model.Venta;
 @Produces(MediaType.APPLICATION_JSON)
 public class VentaResource {
 
+	private Logger logger = Logger.getAnonymousLogger();
+	
 	@Inject
 	IVentaBean ventaBean;
 	
@@ -51,7 +54,9 @@ public class VentaResource {
 		return ventaBean.getVenta(id);
 	}
 	
+	
 	@GET
+	@CatchExceptions
 	@Path("/")
 	public Response getAllVentas() throws Exception
 	{
@@ -89,7 +94,7 @@ public class VentaResource {
 						
 					} catch (Exception e)
 					{
-						e.printStackTrace();
+						logger.log(Level.SEVERE, "an exception was thrown", e);
 					}
 					
 				}
@@ -135,7 +140,9 @@ public class VentaResource {
         boolean exito = ventaBean.addVentasFromFile(FileUpload.TEMP_LOCATION + filename);
         
         File f = new File(FileUpload.TEMP_LOCATION + filename);
-        f.delete();
+        if (!f.delete()) {
+        	logger.log(Level.WARNING, "No se ha podido borrar el archivo %s", FileUpload.TEMP_LOCATION + filename);
+        }
         
         if (exito) { 
         	return Response

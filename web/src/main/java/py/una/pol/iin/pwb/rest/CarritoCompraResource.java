@@ -1,7 +1,10 @@
 package py.una.pol.iin.pwb.rest;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import javax.inject.Inject;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -28,6 +31,7 @@ import py.una.pol.iin.pwb.model.SessionTable;
 @Produces(MediaType.APPLICATION_JSON)
 public class CarritoCompraResource {
 
+	private Logger logger = Logger.getAnonymousLogger();
 	
 	@POST
 	@Path("/crear")
@@ -155,7 +159,7 @@ public class CarritoCompraResource {
 				SessionTable.addSession(sk, carritoCompraBean);			
 				
 			} catch (NamingException e) {
-				e.printStackTrace();
+				logger.log(Level.SEVERE, "an exception was thrown", e);				
 			}
 		    
 						

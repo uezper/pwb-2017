@@ -22,7 +22,7 @@ public class ClienteBean implements IClienteBean {
 	@Override
 	public List<Cliente> getAllClientes() throws Exception {
 				
-		List<Cliente> clientes = null;		
+		List<Cliente> clientes;		
 		clientes = clienteMapper.findAllClientes();			
 		return clientes;		
 	}
@@ -30,7 +30,7 @@ public class ClienteBean implements IClienteBean {
 	@Override
 	public Cliente getCliente(Long id) throws DataNotFoundException, Exception {		
 		
-		Cliente cliente = null;		
+		Cliente cliente;		
 		cliente = clienteMapper.findClienteById(id);
 		
 		if (cliente == null)

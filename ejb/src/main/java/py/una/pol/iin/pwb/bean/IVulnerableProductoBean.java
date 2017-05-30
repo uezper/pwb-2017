@@ -11,10 +11,10 @@ import py.una.pol.iin.pwb.model.Producto;
 @Local
 public interface IVulnerableProductoBean {
 	
-	public List<Producto> getAllProductos() throws Exception;
-	public Producto getProducto(String id)  throws DataNotFoundException, Exception;
-	public Producto addProducto(Producto producto) throws InvalidFormatException, Exception;
-	public Producto updateProducto(Producto producto)  throws DataNotFoundException, InvalidFormatException, Exception;
-	public void removeProducto(String id) throws Exception;
+	public List<Producto> getAllProductos();
+	public Producto getProducto(String id)  throws DataNotFoundException;
+	public Producto addProducto(Producto producto) throws InvalidFormatException;
+	public Producto updateProducto(Producto producto)  throws InvalidFormatException;
+	public void removeProducto(String id);
 	
 }

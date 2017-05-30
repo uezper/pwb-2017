@@ -169,11 +169,16 @@
                         <artifactId>maven-surefire-plugin</artifactId>
                         <version>${version.surefire.plugin}</version>
                         <configuration>
+                        	<redirectTestOutputToFile>true</redirectTestOutputToFile>
                             <skip>false</skip>
                         </configuration>
-                    </plugin>
-                </plugins>
-            </build>
+                    </plugin>       
+                    
+                    
+               
+                           
+                </plugins>               
+            </build>            
         </profile>
 
         <profile>
