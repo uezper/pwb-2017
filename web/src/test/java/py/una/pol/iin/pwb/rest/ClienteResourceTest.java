@@ -18,7 +18,7 @@ public class ClienteResourceTest extends RestTestSetup {
     @Test
 	public void getAllClientesTest(){
     	// Given
-    	RequestSpecification getRequest = given();
+    	RequestSpecification getRequest = given().auth().oauth2(token);
     	
     	// When
     	Response response = getRequest.when().get("/clientes");
@@ -33,7 +33,8 @@ public class ClienteResourceTest extends RestTestSetup {
     public void postClienteTest(){
     	// Given
     	Cliente postCliente = new Cliente(null, "Alan Brado", "1234567890", 0.0);
-        RequestSpecification postRequest = given()
+    	//Cliente postCliente = new Cliente();
+        RequestSpecification postRequest = given().auth().oauth2(token)
 	        .contentType("application/json")
 	        .body(postCliente);
         
@@ -51,11 +52,11 @@ public class ClienteResourceTest extends RestTestSetup {
     @Test
     public void getClienteTest(){
     	// Given
-    	Cliente createdCliente = given().contentType("application/json")
+    	Cliente createdCliente = given().auth().oauth2(token).contentType("application/json")
 			.body(new Cliente(null, "Alan Brado", "1234567890", 0.0))
 	        .when().post("/clientes").as(Cliente.class);
     	
-    	RequestSpecification getRequest = given();
+    	RequestSpecification getRequest = given().auth().oauth2(token);
 
     	// When
     	Response response = getRequest.when().get("/clientes/" + createdCliente.getId());
@@ -69,11 +70,11 @@ public class ClienteResourceTest extends RestTestSetup {
     @Test
     public void putClienteTest(){
     	// Given
-    	Cliente createdCliente = given().contentType("application/json")
+    	Cliente createdCliente = given().auth().oauth2(token).contentType("application/json")
 			.body(new Cliente(null, "Alan Brado", "1234567890", 0.0))
 	        .when().post("/clientes").as(Cliente.class);
     	
-    	RequestSpecification putRequest = given().contentType("application/json")
+    	RequestSpecification putRequest = given().auth().oauth2(token).contentType("application/json")
 			.body(new Cliente(null, "Elen Brado", "0987654321", 10.0));
 
     	// When
@@ -91,17 +92,17 @@ public class ClienteResourceTest extends RestTestSetup {
     @Test
     public void deleteClienteTest(){
     	// Given
-    	Cliente createdCliente = given().contentType("application/json")
+    	Cliente createdCliente = given().auth().oauth2(token).contentType("application/json")
 			.body(new Cliente(null, "Alan Brado", "1234567890", 0.0))
 	        .when().post("/clientes").as(Cliente.class);
     	
-    	RequestSpecification deleteRequest = given();
+    	RequestSpecification deleteRequest = given().auth().oauth2(token);
 
     	// When
     	Response response = deleteRequest.when().delete("/clientes/" + createdCliente.getId());
     	
     	// Then
     	response.then().statusCode(204);
-		given().when().get("clientes/" + createdCliente.getId()).then().statusCode(404);
+		given().auth().oauth2(token).when().get("clientes/" + createdCliente.getId()).then().statusCode(404);
     }
 }

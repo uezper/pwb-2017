@@ -28,13 +28,13 @@ public class CompraResourceTest extends RestTestSetup {
 	@Test
 	public void getCompraTest(){
     	// Given
-		Proveedor createdProveedor = given().contentType("application/json")
+		Proveedor createdProveedor = given().auth().oauth2(token).contentType("application/json")
 			.body(new Proveedor(null, "Alan Brado", "1234567890"))
 	        .when().post("/proveedores").as(Proveedor.class);
-    	Producto createdProducto1 = given().contentType("application/json")
+    	Producto createdProducto1 = given().auth().oauth2(token).contentType("application/json")
 			.body(new Producto(null, "Lapiz", 100))
 	        .when().post("/productos").as(Producto.class);
-    	Producto createdProducto2 = given().contentType("application/json")
+    	Producto createdProducto2 = given().auth().oauth2(token).contentType("application/json")
 			.body(new Producto(null, "Borrador", 110))
 	        .when().post("/productos").as(Producto.class);
     	
@@ -53,9 +53,9 @@ public class CompraResourceTest extends RestTestSetup {
 		compra.setProveedorId(createdProveedor.getId());
 		compra.setDetalles(detalles);
 		
-		Compra createdCompra = given().contentType("application/json").body(compra).when().post("/compras").as(Compra.class);
+		Compra createdCompra = given().auth().oauth2(token).contentType("application/json").body(compra).when().post("/compras").as(Compra.class);
     	
-		RequestSpecification getRequest = given();
+		RequestSpecification getRequest = given().auth().oauth2(token);
 		
     	// When
 		Response response = getRequest.when().get("/compras/" + createdCompra.getId());
@@ -71,7 +71,7 @@ public class CompraResourceTest extends RestTestSetup {
 	@Test
 	public void getAllComprasTest(){
     	// Given
-    	RequestSpecification getRequest = given();
+    	RequestSpecification getRequest = given().auth().oauth2(token);
     	
     	// When
     	Response response = getRequest.when().get("/compras");
@@ -85,13 +85,13 @@ public class CompraResourceTest extends RestTestSetup {
 	@Test
 	public void comprarTest(){
     	// Given
-		Proveedor createdProveedor = given().contentType("application/json")
+		Proveedor createdProveedor = given().auth().oauth2(token).contentType("application/json")
 			.body(new Proveedor(null, "Alan Brado", "1234567890"))
 	        .when().post("/proveedores").as(Proveedor.class);
-    	Producto createdProducto1 = given().contentType("application/json")
+    	Producto createdProducto1 = given().auth().oauth2(token).contentType("application/json")
 			.body(new Producto(null, "Lapiz", 100))
 	        .when().post("/productos").as(Producto.class);
-    	Producto createdProducto2 = given().contentType("application/json")
+    	Producto createdProducto2 = given().auth().oauth2(token).contentType("application/json")
 			.body(new Producto(null, "Borrador", 110))
 	        .when().post("/productos").as(Producto.class);
     	
@@ -110,7 +110,7 @@ public class CompraResourceTest extends RestTestSetup {
 		compra.setProveedorId(createdProveedor.getId());
 		compra.setDetalles(detalles);
 		
-		RequestSpecification compraRequest = given().contentType("application/json").body(compra);
+		RequestSpecification compraRequest = given().auth().oauth2(token).contentType("application/json").body(compra);
     	
     	// When
 		Response response = compraRequest.when().post("/compras");
@@ -127,13 +127,13 @@ public class CompraResourceTest extends RestTestSetup {
 	@Test
 	public void comprarWithFileTest(){
     	// Given
-		Proveedor createdProveedor = given().contentType("application/json")
+		Proveedor createdProveedor = given().auth().oauth2(token).contentType("application/json")
 			.body(new Proveedor(null, "Alan Brado", "1234567890"))
 	        .when().post("/proveedores").as(Proveedor.class);
-    	Producto createdProducto1 = given().contentType("application/json")
+    	Producto createdProducto1 = given().auth().oauth2(token).contentType("application/json")
 			.body(new Producto(null, "Lapiz", 100))
 	        .when().post("/productos").as(Producto.class);
-    	Producto createdProducto2 = given().contentType("application/json")
+    	Producto createdProducto2 = given().auth().oauth2(token).contentType("application/json")
 			.body(new Producto(null, "Borrador", 110))
 	        .when().post("/productos").as(Producto.class);
     	
@@ -174,7 +174,7 @@ public class CompraResourceTest extends RestTestSetup {
 	    		"]");
 		}catch(Exception e){}
 	    
-    	RequestSpecification compraRequest = given().multiPart(tempFile);
+    	RequestSpecification compraRequest = given().auth().oauth2(token).multiPart(tempFile);
     	
     	// When
     	Response response = compraRequest.post("/compras");

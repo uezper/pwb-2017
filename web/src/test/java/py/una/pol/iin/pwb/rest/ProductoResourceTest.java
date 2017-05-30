@@ -18,7 +18,7 @@ public class ProductoResourceTest extends RestTestSetup {
     @Test
 	public void getAllProductosTest(){
     	// Given
-    	RequestSpecification getRequest = given();
+    	RequestSpecification getRequest = given().auth().oauth2(token);
     	
     	// When
     	Response response = getRequest.when().get("/productos");
@@ -33,7 +33,7 @@ public class ProductoResourceTest extends RestTestSetup {
     public void postProductoTest(){
     	// Given
     	Producto postProducto = new Producto(null, "Lapiz", 100);
-        RequestSpecification postRequest = given()
+        RequestSpecification postRequest = given().auth().oauth2(token)
 	        .contentType("application/json")
 	        .body(postProducto);
         
@@ -52,11 +52,11 @@ public class ProductoResourceTest extends RestTestSetup {
     @Test
     public void getProductoTest(){
     	// Given
-    	Producto createdProducto = given().contentType("application/json")
+    	Producto createdProducto = given().auth().oauth2(token).contentType("application/json")
 			.body(new Producto(null, "Lapiz", 100))
 	        .when().post("/productos").as(Producto.class);
     	
-    	RequestSpecification getRequest = given();
+    	RequestSpecification getRequest = given().auth().oauth2(token);
 
     	// When
     	Response response = getRequest.when().get("/productos/" + createdProducto.getId());
@@ -70,11 +70,11 @@ public class ProductoResourceTest extends RestTestSetup {
     @Test
     public void putProductoTest(){
     	// Given
-    	Producto createdProducto = given().contentType("application/json")
+    	Producto createdProducto = given().auth().oauth2(token).contentType("application/json")
 			.body(new Producto(null, "Lapiz", 100))
 	        .when().post("/productos").as(Producto.class);
     	
-    	RequestSpecification putRequest = given().contentType("application/json")
+    	RequestSpecification putRequest = given().auth().oauth2(token).contentType("application/json")
     			.body(new Producto(null, "Borrador", 101));
 
     	// When
@@ -91,17 +91,17 @@ public class ProductoResourceTest extends RestTestSetup {
     @Test
     public void deleteProductoTest(){
     	// Given
-    	Producto createdProducto = given().contentType("application/json")
+    	Producto createdProducto = given().auth().oauth2(token).contentType("application/json")
 			.body(new Producto(null, "Lapiz", 100))
 	        .when().post("/productos").as(Producto.class);
     	
-    	RequestSpecification deleteRequest = given();
+    	RequestSpecification deleteRequest = given().auth().oauth2(token);
 
     	// When
     	Response response = deleteRequest.when().delete("/productos/" + createdProducto.getId());
     	
     	// Then
     	response.then().statusCode(204);
-		given().when().get("productos/" + createdProducto.getId()).then().statusCode(404);
+		given().auth().oauth2(token).when().get("productos/" + createdProducto.getId()).then().statusCode(404);
     }
 }

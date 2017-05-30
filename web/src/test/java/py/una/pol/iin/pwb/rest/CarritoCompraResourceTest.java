@@ -28,13 +28,13 @@ public class CarritoCompraResourceTest extends RestTestSetup{
 	@Test
 	public void comprar(){
     	// Given
-		Proveedor createdProveedor = given().contentType("application/json")
+		Proveedor createdProveedor = given().auth().oauth2(token).contentType("application/json")
 			.body(new Proveedor(null, "Alan Brado", "1234567890"))
 	        .when().post("/proveedores").as(Proveedor.class);
-    	Producto createdProducto1 = given().contentType("application/json")
+    	Producto createdProducto1 = given().auth().oauth2(token).contentType("application/json")
 			.body(new Producto(null, "Lapiz", 100))
 	        .when().post("/productos").as(Producto.class);
-    	Producto createdProducto2 = given().contentType("application/json")
+    	Producto createdProducto2 = given().auth().oauth2(token).contentType("application/json")
 			.body(new Producto(null, "Borrador", 110))
 	        .when().post("/productos").as(Producto.class);
     	
@@ -53,18 +53,18 @@ public class CarritoCompraResourceTest extends RestTestSetup{
 		compra.setProveedorId(createdProveedor.getId());
 		
 		// When
-		Response response = given().contentType("application/json")
+		Response response = given().auth().oauth2(token).contentType("application/json")
 			.body(compra)
 			.when().post("/carritoCompra/crear");
 		response.then().statusCode(200);
 		Map<String, String> headers = new HashMap<String, String>();
 		headers.put("session-key", response.getHeader("session-key"));
 
-		response = given().contentType("application/json")
+		response = given().auth().oauth2(token).contentType("application/json")
 			.headers(headers).body(detalles)
 			.when().post("/carritoCompra/agregarProducto");
 
-		response = given().contentType("application/json").headers(headers).when().post("/carritoCompra/finalizar");
+		response = given().auth().oauth2(token).contentType("application/json").headers(headers).when().post("/carritoCompra/finalizar");
 		
 		// Then
 		response.then().statusCode(200);

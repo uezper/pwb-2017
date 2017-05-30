@@ -28,13 +28,13 @@ public class VentaResourceTest extends RestTestSetup {
 	@Test
 	public void getVentaTest(){
     	// Given
-		Cliente createdCliente = given().contentType("application/json")
+		Cliente createdCliente = given().auth().oauth2(token).contentType("application/json")
 			.body(new Cliente(null, "Alan Brado", "1234567890", 0.0))
 	        .when().post("/clientes").as(Cliente.class);
-    	Producto createdProducto1 = given().contentType("application/json")
+    	Producto createdProducto1 = given().auth().oauth2(token).contentType("application/json")
 			.body(new Producto(null, "Lapiz", 100))
 	        .when().post("/productos").as(Producto.class);
-    	Producto createdProducto2 = given().contentType("application/json")
+    	Producto createdProducto2 = given().auth().oauth2(token).contentType("application/json")
 			.body(new Producto(null, "Borrador", 110))
 	        .when().post("/productos").as(Producto.class);
     	
@@ -53,9 +53,9 @@ public class VentaResourceTest extends RestTestSetup {
 		venta.setClienteId(createdCliente.getId());
 		venta.setDetalles(detalles);
 		
-		Venta createdVenta = given().contentType("application/json").body(venta).when().post("/ventas").as(Venta.class);
+		Venta createdVenta = given().auth().oauth2(token).contentType("application/json").body(venta).when().post("/ventas").as(Venta.class);
     	
-		RequestSpecification getRequest = given();
+		RequestSpecification getRequest = given().auth().oauth2(token);
 		
     	// When
 		Response response = getRequest.when().get("/ventas/" + createdVenta.getId());
@@ -71,7 +71,7 @@ public class VentaResourceTest extends RestTestSetup {
 	@Test
 	public void getAllVentasTest(){
     	// Given
-    	RequestSpecification getRequest = given();
+    	RequestSpecification getRequest = given().auth().oauth2(token);
     	
     	// When
     	Response response = getRequest.when().get("/ventas");
@@ -85,13 +85,13 @@ public class VentaResourceTest extends RestTestSetup {
 	@Test
 	public void venderTest(){
     	// Given
-		Cliente createdCliente = given().contentType("application/json")
+		Cliente createdCliente = given().auth().oauth2(token).contentType("application/json")
 			.body(new Cliente(null, "Alan Brado", "1234567890", 0.0))
 	        .when().post("/clientes").as(Cliente.class);
-    	Producto createdProducto1 = given().contentType("application/json")
+    	Producto createdProducto1 = given().auth().oauth2(token).contentType("application/json")
 			.body(new Producto(null, "Lapiz", 100))
 	        .when().post("/productos").as(Producto.class);
-    	Producto createdProducto2 = given().contentType("application/json")
+    	Producto createdProducto2 = given().auth().oauth2(token).contentType("application/json")
 			.body(new Producto(null, "Borrador", 110))
 	        .when().post("/productos").as(Producto.class);
     	
@@ -110,7 +110,7 @@ public class VentaResourceTest extends RestTestSetup {
 		venta.setClienteId(createdCliente.getId());
 		venta.setDetalles(detalles);
 		
-		RequestSpecification ventaRequest = given().contentType("application/json").body(venta);
+		RequestSpecification ventaRequest = given().auth().oauth2(token).contentType("application/json").body(venta);
     	
     	// When
 		Response response = ventaRequest.when().post("/ventas");
@@ -127,13 +127,13 @@ public class VentaResourceTest extends RestTestSetup {
 	@Test
 	public void venderWithFileTest(){
     	// Given
-		Cliente createdCliente = given().contentType("application/json")
+		Cliente createdCliente = given().auth().oauth2(token).contentType("application/json")
 			.body(new Cliente(null, "Alan Brado", "1234567890", 0.0))
 	        .when().post("/clientes").as(Cliente.class);
-    	Producto createdProducto1 = given().contentType("application/json")
+    	Producto createdProducto1 = given().auth().oauth2(token).contentType("application/json")
 			.body(new Producto(null, "Lapiz", 100))
 	        .when().post("/productos").as(Producto.class);
-    	Producto createdProducto2 = given().contentType("application/json")
+    	Producto createdProducto2 = given().auth().oauth2(token).contentType("application/json")
 			.body(new Producto(null, "Borrador", 110))
 	        .when().post("/productos").as(Producto.class);
     	
@@ -174,7 +174,7 @@ public class VentaResourceTest extends RestTestSetup {
 	    		"]");
 		}catch(Exception e){}
 	    
-    	RequestSpecification ventaRequest = given().multiPart(tempFile);
+    	RequestSpecification ventaRequest = given().auth().oauth2(token).multiPart(tempFile);
     	
     	// When
     	Response response = ventaRequest.post("/ventas");
