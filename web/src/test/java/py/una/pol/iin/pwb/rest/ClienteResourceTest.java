@@ -53,7 +53,7 @@ public class ClienteResourceTest extends RestTestSetup {
     public void getClienteTest(){
     	// Given
     	Cliente createdCliente = given().auth().oauth2(token).contentType("application/json")
-			.body(new Cliente(null, "Alan Brado", "1234567890", 0.0))
+			.body(new Cliente(0L, "Alan Brado", "1234567890", 0.0))
 	        .when().post("/clientes").as(Cliente.class);
     	
     	RequestSpecification getRequest = given().auth().oauth2(token);
@@ -71,11 +71,11 @@ public class ClienteResourceTest extends RestTestSetup {
     public void putClienteTest(){
     	// Given
     	Cliente createdCliente = given().auth().oauth2(token).contentType("application/json")
-			.body(new Cliente(null, "Alan Brado", "1234567890", 0.0))
+			.body(new Cliente(0L, "Alan Brado", "1234567890", 0.0))
 	        .when().post("/clientes").as(Cliente.class);
     	
     	RequestSpecification putRequest = given().auth().oauth2(token).contentType("application/json")
-			.body(new Cliente(null, "Elen Brado", "0987654321", 10.0));
+			.body(new Cliente(0L, "Elen Brado", "0987654321", 10.0));
 
     	// When
     	Response response = putRequest.when().put("/clientes/" + createdCliente.getId());
@@ -93,7 +93,7 @@ public class ClienteResourceTest extends RestTestSetup {
     public void deleteClienteTest(){
     	// Given
     	Cliente createdCliente = given().auth().oauth2(token).contentType("application/json")
-			.body(new Cliente(null, "Alan Brado", "1234567890", 0.0))
+			.body(new Cliente(0L, "Alan Brado", "1234567890", 0.0))
 	        .when().post("/clientes").as(Cliente.class);
     	
     	RequestSpecification deleteRequest = given().auth().oauth2(token);

@@ -29,7 +29,7 @@ public class CarritoVentaResourceTest extends RestTestSetup{
 	public void vender(){
     	// Given
 		Cliente createdCliente = given().auth().oauth2(token).contentType("application/json")
-			.body(new Cliente(null, "Alan Brado", "1234567890", 0.0))
+			.body(new Cliente(0L, "Alan Brado", "1234567890", 0.0))
 	        .when().post("/clientes").as(Cliente.class);
     	Producto createdProducto1 = given().auth().oauth2(token).contentType("application/json")
 			.body(new Producto(null, "Lapiz", 100))
