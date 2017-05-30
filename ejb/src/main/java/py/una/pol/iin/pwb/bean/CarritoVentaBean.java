@@ -1,5 +1,6 @@
 package py.una.pol.iin.pwb.bean;
 
+import java.util.HashSet;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -89,6 +90,7 @@ public class CarritoVentaBean implements ICarritoVentaBean {
 			
 			this.venta = venta;
 			this.venta.setCliente(cliente);
+			this.venta.setDetalleVentas(new HashSet<DetalleVenta>());
 			
 			ventaMapper.insertVenta(this.venta);
 		} catch (DataNotFoundException e) {
@@ -186,6 +188,7 @@ public class CarritoVentaBean implements ICarritoVentaBean {
 						detalleVenta.setVenta(this.venta);
 						detalleVenta.setProducto(producto);
 						detalleVentaMapper.insertDetalleVenta(detalleVenta);
+						this.venta.getDetalleVentas().add(detalleVenta);
 						
 					}
 					

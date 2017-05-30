@@ -167,7 +167,7 @@ public class CarritoCompraBeanTest {
     	Compra resultado = carritoCompraBean.agregarProductos(detalleCompras);
 
 
-    	verify(detalleCompraMapper, times(3)).insertDetalleCompra(any(DetalleCompra.class));
+    	verify(detalleCompraMapper, atLeast(1)).insertDetalleCompra(any(DetalleCompra.class));
     }
 
     @Test(expected=InvalidArgumentException.class)

@@ -1,5 +1,6 @@
 package py.una.pol.iin.pwb.bean;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -21,6 +22,7 @@ import py.una.pol.iin.pwb.exception.InvalidArgumentException;
 import py.una.pol.iin.pwb.exception.InvalidFormatException;
 import py.una.pol.iin.pwb.model.Compra;
 import py.una.pol.iin.pwb.model.DetalleCompra;
+import py.una.pol.iin.pwb.model.DetalleVenta;
 import py.una.pol.iin.pwb.model.Producto;
 import py.una.pol.iin.pwb.model.Proveedor;
 import py.una.pol.iin.pwb.mybatis.MyBatisUtil;
@@ -93,6 +95,7 @@ public class CarritoCompraBean implements ICarritoCompraBean {
 			
 			this.compra = compra;
 			this.compra.setProveedor(proveedor);
+			this.compra.setDetalleCompras(new HashSet<DetalleCompra>());
 			
 			compraMapper.insertCompra(this.compra);
 		} catch (DataNotFoundException e) {
@@ -175,6 +178,7 @@ public class CarritoCompraBean implements ICarritoCompraBean {
 						detalleCompra.setCompra(this.compra);
 						detalleCompra.setProducto(producto);
 						detalleCompraMapper.insertDetalleCompra(detalleCompra);
+						this.compra.getDetalleCompras().add(detalleCompra);
 						
 					}
 					
