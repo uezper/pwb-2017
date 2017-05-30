@@ -29,7 +29,7 @@ public class VentaResourceTest extends RestTestSetup {
 	public void getVentaTest(){
     	// Given
 		Cliente createdCliente = given().auth().oauth2(token).contentType("application/json")
-			.body(new Cliente(null, "Alan Brado", "1234567890", 0.0))
+			.body(new Cliente(0L, "Alan Brado", "1234567890", 0.0))
 	        .when().post("/clientes").as(Cliente.class);
     	Producto createdProducto1 = given().auth().oauth2(token).contentType("application/json")
 			.body(new Producto(null, "Lapiz", 100))
@@ -86,7 +86,7 @@ public class VentaResourceTest extends RestTestSetup {
 	public void venderTest(){
     	// Given
 		Cliente createdCliente = given().auth().oauth2(token).contentType("application/json")
-			.body(new Cliente(null, "Alan Brado", "1234567890", 0.0))
+			.body(new Cliente(0L, "Alan Brado", "1234567890", 0.0))
 	        .when().post("/clientes").as(Cliente.class);
     	Producto createdProducto1 = given().auth().oauth2(token).contentType("application/json")
 			.body(new Producto(null, "Lapiz", 100))
@@ -128,7 +128,7 @@ public class VentaResourceTest extends RestTestSetup {
 	public void venderWithFileTest(){
     	// Given
 		Cliente createdCliente = given().auth().oauth2(token).contentType("application/json")
-			.body(new Cliente(null, "Alan Brado", "1234567890", 0.0))
+			.body(new Cliente(0L, "Alan Brado", "1234567890", 0.0))
 	        .when().post("/clientes").as(Cliente.class);
     	Producto createdProducto1 = given().auth().oauth2(token).contentType("application/json")
 			.body(new Producto(null, "Lapiz", 100))
