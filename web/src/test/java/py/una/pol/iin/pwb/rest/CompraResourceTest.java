@@ -29,7 +29,7 @@ public class CompraResourceTest extends RestTestSetup {
 	public void getCompraTest(){
     	// Given
 		Proveedor createdProveedor = given().auth().oauth2(token).contentType("application/json")
-			.body(new Proveedor(null, "Alan Brado", "1234567890"))
+			.body(new Proveedor(0L, "Alan Brado", "1234567890"))
 	        .when().post("/proveedores").as(Proveedor.class);
     	Producto createdProducto1 = given().auth().oauth2(token).contentType("application/json")
 			.body(new Producto(null, "Lapiz", 100))
@@ -86,7 +86,7 @@ public class CompraResourceTest extends RestTestSetup {
 	public void comprarTest(){
     	// Given
 		Proveedor createdProveedor = given().auth().oauth2(token).contentType("application/json")
-			.body(new Proveedor(null, "Alan Brado", "1234567890"))
+			.body(new Proveedor(0L, "Alan Brado", "1234567890"))
 	        .when().post("/proveedores").as(Proveedor.class);
     	Producto createdProducto1 = given().auth().oauth2(token).contentType("application/json")
 			.body(new Producto(null, "Lapiz", 100))
@@ -128,7 +128,7 @@ public class CompraResourceTest extends RestTestSetup {
 	public void comprarWithFileTest(){
     	// Given
 		Proveedor createdProveedor = given().auth().oauth2(token).contentType("application/json")
-			.body(new Proveedor(null, "Alan Brado", "1234567890"))
+			.body(new Proveedor(0L, "Alan Brado", "1234567890"))
 	        .when().post("/proveedores").as(Proveedor.class);
     	Producto createdProducto1 = given().auth().oauth2(token).contentType("application/json")
 			.body(new Producto(null, "Lapiz", 100))
